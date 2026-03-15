@@ -1,7 +1,7 @@
 import storage
 
-# renaming storage to BlastPad
+# renaming storage to WorldPad
 storage.remount("/", readonly=False)
 m = storage.getmount("/")
-m.label = "BlastPad"
+m.label = "WorldPad"
 storage.remount("/", readonly=True)

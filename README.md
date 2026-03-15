@@ -160,7 +160,9 @@ It is super easy. Hold **Action Key** (the lonley key on the right side of the d
 
 
 
+# Firmware
 
+Firmware supports CircuitPython 10.1.4 for PICO rp2024.
 
 
 

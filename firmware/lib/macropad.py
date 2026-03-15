@@ -15,7 +15,7 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from minikbd import MiniKbdButtons
-import collections
+import i2cdisplaybus
 
 def divideListIntoUIChunks(l):
 	div_l = []
@@ -78,7 +78,7 @@ def initOptions():
 			
 			optionsDict[file[:-5]] = mappingDict
 
-	return collections.OrderedDict(sorted(optionsDict.items(), key=lambda t: t[0]))
+	return dict(sorted(optionsDict.items(), key=lambda t: t[0]))
 
 
 class Encoder:
@@ -215,7 +215,7 @@ class MacroPadUI:
 		SDA = getattr(board,sda)
 		SCL = getattr(board,scl)
 		i2c = busio.I2C(SCL, SDA, frequency=400000)
-		i2c_bus = displayio.I2CDisplay(i2c, device_address=60)
+		i2c_bus = i2cdisplaybus.I2CDisplayBus(i2c, device_address=60)
 		WIDTH = 132
 		HEIGHT = 64
 		BORDER = 10
@@ -224,7 +224,7 @@ class MacroPadUI:
 		tile_grid = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
 		splash = displayio.Group()
 		splash.append(tile_grid)
-		display.show(splash)
+		display.root_group = splash
 	
 		time.sleep(1.5)
 		splash.remove(tile_grid)
