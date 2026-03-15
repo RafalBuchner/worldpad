@@ -136,10 +136,15 @@
     if (event.shiftKey) modifiers.push("Shift");
     if (event.altKey) modifiers.push("Option");
     if (event.metaKey) modifiers.push("Command");
+    // When Alt/Option is held, event.key may be a dead/composed character (e.g. "ą" for Option+A).
+    // Use event.code to recover the physical key instead.
+    const physicalKey = event.altKey && key.length === 1 && !BROWSER_KEY_TO_INTERNAL[key]
+      ? (event.code.startsWith("Key") ? event.code.slice(3) : event.code.startsWith("Digit") ? event.code.slice(5) : key.toUpperCase())
+      : key;
     let mainKey =
-      BROWSER_KEY_TO_INTERNAL[key] ??
-      (key.length === 1 ? key.toUpperCase() : key);
-    if (event.shiftKey && SHIFT_FIX[key]) mainKey = SHIFT_FIX[key];
+      BROWSER_KEY_TO_INTERNAL[physicalKey] ??
+      (physicalKey.length === 1 ? physicalKey.toUpperCase() : physicalKey);
+    if (event.shiftKey && SHIFT_FIX[physicalKey]) mainKey = SHIFT_FIX[physicalKey];
     return [...modifiers, mainKey].map((k) => SYSTEM_KEY_SYMBOLS[k] ?? k);
   }
 
@@ -424,47 +429,52 @@
 
         {#if editingKeyIndex !== null}
           <div class="relative z-20 space-y-2">
-            <div
-              class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
-            >
-              {#each pickedKeys as key, i}
-                {#if i > 0}<span
-                    class="text-base-content/30 text-xs select-none font-mono"
-                    >+</span
-                  >{/if}
-                <button
-                  class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
-                  onclick={() => {
-                    pickedKeys = pickedKeys.filter((_, j) => j !== i);
-                    captureInputEl?.focus();
-                  }}
-                  title="Click to remove"
-                  >{key} <span class="opacity-40 text-xs">×</span></button
+            <div class="flex gap-2 items-stretch">
+              <div class="flex-1 space-y-2">
+                <div
+                  class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
                 >
-              {/each}
-              {#if pickedKeys.length === 0}
-                <span class="text-base-content/30 text-xs italic"
-                  >press a key or pick from below…</span
-                >
-              {/if}
-            </div>
-            <div class="flex items-center gap-2">
+                  {#each pickedKeys as key, i}
+                    {#if i > 0}<span
+                        class="text-base-content/30 text-xs select-none font-mono"
+                        >+</span
+                      >{/if}
+                    <button
+                      class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
+                      onclick={() => {
+                        pickedKeys = pickedKeys.filter((_, j) => j !== i);
+                        captureInputEl?.focus();
+                      }}
+                      title="Click to remove"
+                      >{key} <span class="opacity-40 text-xs">×</span></button
+                    >
+                  {/each}
+                  {#if pickedKeys.length === 0}
+                    <span class="text-base-content/30 text-xs italic"
+                      >press a key or pick from below…</span
+                    >
+                  {/if}
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    class="btn btn-xs btn-ghost"
+                    onclick={() => {
+                      showKeyPicker = !showKeyPicker;
+                      captureInputEl?.focus();
+                    }}
+                  >
+                    keys {showKeyPicker ? "▴" : "▾"}
+                  </button>
+                  <button
+                    class="btn btn-error btn-xs ml-auto"
+                    onclick={cancelEditing}>cancel</button
+                  >
+                </div>
+              </div>
               <button
-                class="btn btn-xs btn-ghost"
-                onclick={() => {
-                  showKeyPicker = !showKeyPicker;
-                  captureInputEl?.focus();
-                }}
-              >
-                keys {showKeyPicker ? "▴" : "▾"}
-              </button>
-              <button
-                class="btn btn-xs btn-primary"
+                class="btn btn-primary px-6 h-auto self-stretch rounded"
                 disabled={pickedKeys.length === 0}
                 onclick={confirmEditing}>set</button
-              >
-              <button class="btn btn-xs btn-error" onclick={cancelEditing}
-                >cancel</button
               >
             </div>
             {#if showKeyPicker}
@@ -605,49 +615,54 @@
         {#if editingEncoderHotkey !== null}
           <!-- Encoder chip editor -->
           <div class="relative z-20 space-y-2">
-            <div
-              class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
-            >
-              {#each encoderPickedKeys as key, i}
-                {#if i > 0}<span
-                    class="text-base-content/30 text-xs select-none font-mono"
-                    >+</span
-                  >{/if}
-                <button
-                  class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
-                  onclick={() => {
-                    encoderPickedKeys = encoderPickedKeys.filter(
-                      (_, j) => j !== i,
-                    );
-                    encoderCaptureInputEl?.focus();
-                  }}
-                  title="Click to remove"
-                  >{key} <span class="opacity-40 text-xs">×</span></button
+            <div class="flex gap-2 items-stretch">
+              <div class="flex-1 space-y-2">
+                <div
+                  class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
                 >
-              {/each}
-              {#if encoderPickedKeys.length === 0}
-                <span class="text-base-content/30 text-xs italic"
-                  >press a key or pick from below…</span
-                >
-              {/if}
-            </div>
-            <div class="flex items-center gap-2">
+                  {#each encoderPickedKeys as key, i}
+                    {#if i > 0}<span
+                        class="text-base-content/30 text-xs select-none font-mono"
+                        >+</span
+                      >{/if}
+                    <button
+                      class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
+                      onclick={() => {
+                        encoderPickedKeys = encoderPickedKeys.filter(
+                          (_, j) => j !== i,
+                        );
+                        encoderCaptureInputEl?.focus();
+                      }}
+                      title="Click to remove"
+                      >{key} <span class="opacity-40 text-xs">×</span></button
+                    >
+                  {/each}
+                  {#if encoderPickedKeys.length === 0}
+                    <span class="text-base-content/30 text-xs italic"
+                      >press a key or pick from below…</span
+                    >
+                  {/if}
+                </div>
+                <div class="flex items-center gap-2">
+                  <button
+                    class="btn btn-xs btn-ghost"
+                    onclick={() => {
+                      encoderShowPicker = !encoderShowPicker;
+                      encoderCaptureInputEl?.focus();
+                    }}
+                  >
+                    keys {encoderShowPicker ? "▴" : "▾"}
+                  </button>
+                  <button
+                    class="btn btn-error btn-xs ml-auto"
+                    onclick={cancelEncoderHotkey}>cancel</button
+                  >
+                </div>
+              </div>
               <button
-                class="btn btn-xs btn-ghost"
-                onclick={() => {
-                  encoderShowPicker = !encoderShowPicker;
-                  encoderCaptureInputEl?.focus();
-                }}
-              >
-                keys {encoderShowPicker ? "▴" : "▾"}
-              </button>
-              <button
-                class="btn btn-xs btn-primary"
+                class="btn btn-primary px-6 h-auto self-stretch rounded"
                 disabled={encoderPickedKeys.length === 0}
                 onclick={confirmEncoderHotkey}>set</button
-              >
-              <button class="btn btn-xs btn-error" onclick={cancelEncoderHotkey}
-                >cancel</button
               >
             </div>
             {#if encoderShowPicker}
