@@ -155,6 +155,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Svelte / webapp
+webapp/node_modules/
+webapp/dist/
+webapp/.svelte-kit/
+
 # Temporary files
 *.000
 *.bak
