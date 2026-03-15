@@ -1,7 +1,7 @@
 # !/bin/bash
 
-# create blastPadEnv
-echo "installing python virtual env for BlastPad"
+# create worldPadEnv
+echo "installing python virtual env for WorldPad"
 python3 -m venv ${PWD}/venv
 source ${PWD}/venv/bin/activate
 

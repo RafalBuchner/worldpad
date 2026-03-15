@@ -156,7 +156,7 @@
   }
 </script>
 
-<h1>BlastPad</h1>
+<h1>WorldPad</h1>
 
 <hr />
 

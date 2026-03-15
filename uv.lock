@@ -12,7 +12,7 @@ wheels = [
 ]
 
 [[package]]
-name = "blastpad"
+name = "worldpad"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

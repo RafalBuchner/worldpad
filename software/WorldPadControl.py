@@ -4,7 +4,7 @@ from collections import OrderedDict
 import pprint
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-CONFIG_PATH = "/Volumes/BlastPad/configs"
+CONFIG_PATH = "/Volumes/WorldPad/configs"
 
 def convertSymbolicToAdafruitNames(shortcut):
     shortcut = [ SYSTEM_KEY_SYMBOLS_Inverted.get(i, i) for i in shortcut ]
@@ -18,11 +18,11 @@ def convertAdafruitToSymbolicNames(shortcut):
     # shortcut = [ QT_CONVERSION_Inverted.get(i, i) for i in shortcut ]
     return shortcut
     
-def convertAdafruitConfigToSymbolic(blastPadDict):
-    blastPadDict["shortcuts"] = [convertAdafruitToSymbolicNames(shortcut) for shortcut in blastPadDict["shortcuts"]]
-    for enName, shortcuts in blastPadDict["wheels"].items():
-        blastPadDict["wheels"][enName] = [convertAdafruitToSymbolicNames(shortcut) for shortcut in shortcuts]
-    return blastPadDict
+def convertAdafruitConfigToSymbolic(worldPadDict):
+    worldPadDict["shortcuts"] = [convertAdafruitToSymbolicNames(shortcut) for shortcut in worldPadDict["shortcuts"]]
+    for enName, shortcuts in worldPadDict["wheels"].items():
+        worldPadDict["wheels"][enName] = [convertAdafruitToSymbolicNames(shortcut) for shortcut in shortcuts]
+    return worldPadDict
 
 if sys.platform == "darwin":
     QT_CONVERSION = {
@@ -507,7 +507,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.hotkeyList = DEFAULT_HOTKEYS
 
-        self.setWindowTitle("BlastPad")
+        self.setWindowTitle("WorldPad")
 
         layout = QtWidgets.QGridLayout()
         self.setFixedSize(QtCore.QSize(1000, 700))
@@ -693,14 +693,14 @@ class MainWindow(QtWidgets.QMainWindow):
         path = ""
         if os.path.exists(CONFIG_PATH):
             path = CONFIG_PATH
-        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", path,"json blastpad file (*.json)")
+        fileName, _ = QtWidgets.QFileDialog.getOpenFileName(self,"QFileDialog.getOpenFileName()", path,"json worldpad file (*.json)")
         if fileName == "": return
         with open(fileName, "r") as f:
-            blastPadDict = convertAdafruitConfigToSymbolic(json.load(f))
+            worldPadDict = convertAdafruitConfigToSymbolic(json.load(f))
 
-            self.hotkeyList = blastPadDict['shortcuts']
+            self.hotkeyList = worldPadDict['shortcuts']
             self.refreshButtons()
-            self.encTable.importData(blastPadDict['wheels'])
+            self.encTable.importData(worldPadDict['wheels'])
         pass
 
     def saveCallback(self):
@@ -708,7 +708,7 @@ class MainWindow(QtWidgets.QMainWindow):
         path = ""
         if os.path.exists(CONFIG_PATH):
             path = CONFIG_PATH
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()",path,"json blastpad file (*.json)")
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self,"QFileDialog.getSaveFileName()",path,"json worldpad file (*.json)")
         if fileName == "": return
         with open(fileName, "w") as f:
             f.write(json_text)

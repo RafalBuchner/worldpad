@@ -1,8 +1,8 @@
 ![package_cover](/Photos/package_cover.png)
 
-# BLASTPad Documentation
+# WORLDPad Documentation
 
-**BLASTPad** is a macropad – a programmable keyboard with 23 customazible keys and 2 encoders (knobs).
+**WORLDPad** is a macropad – a programmable keyboard with 23 customazible keys and 2 encoders (knobs).
 
 # Instruction
 
@@ -10,11 +10,11 @@
 
 ![top_view_description](resources/top_view_description.png)
 
-Keyborad's layout was designed to resamble the most left 5 columns of a standard keyborad with the exclusion of the top row (which usually contains all the _F_ keys together with _ESC_ key ). All of the keys are programmable, which means that with the help of a small desktop app you will be able to change behaviour of each key by assigning keystroke combinations to all of them. Additionally **BLASTPad** has two rotary encoders, which also can trigger some keystroke actions.
+Keyborad's layout was designed to resamble the most left 5 columns of a standard keyborad with the exclusion of the top row (which usually contains all the _F_ keys together with _ESC_ key ). All of the keys are programmable, which means that with the help of a small desktop app you will be able to change behaviour of each key by assigning keystroke combinations to all of them. Additionally **WORLDPad** has two rotary encoders, which also can trigger some keystroke actions.
 
 ## First Run
 
-1. Connect your **BLASTPad** to your computer via USB MICRO B cable. New usb storage device called **BLASTPAD** should appear. We will talk about it more later.
+1. Connect your **WORLDPad** to your computer via USB MICRO B cable. New usb storage device called **WORLDPAD** should appear. We will talk about it more later.
 2. Wait until **BLAST** logo will disappear.
 3. You should see the similar data on the display:
 
@@ -52,13 +52,13 @@ There are two **types of Encoder Actions**:
 
 ## Creating and editing Presets
 
-**Preset** is a singular set of instructions, which determines what keystroke sequence will be triggered by your keys or encoders. You can store almost as many presets on your **BlastPad** as you want.
+**Preset** is a singular set of instructions, which determines what keystroke sequence will be triggered by your keys or encoders. You can store almost as many presets on your **WorldPad** as you want.
 
 #### Maximum number of actions in the Preset:
 
-Each **Preset** has actions assigned to the keys, which max number in the preset is equal to the number of the buttons in **BLASTPad**'s keyboard layout (23 – excluding the special lonely key on the right side of the device). Besides **Key Actions**, each preset can have **Encoder Actions**. Number of those is in theory limitless. You can switch between all of **Preset**'s **Encoder Actions** with just two physical encoders.
+Each **Preset** has actions assigned to the keys, which max number in the preset is equal to the number of the buttons in **WORLDPad**'s keyboard layout (23 – excluding the special lonely key on the right side of the device). Besides **Key Actions**, each preset can have **Encoder Actions**. Number of those is in theory limitless. You can switch between all of **Preset**'s **Encoder Actions** with just two physical encoders.
 
-#### BlastPadControl app
+#### WorldPadControl app
 
 ### MacOS
 
@@ -68,11 +68,11 @@ Each **Preset** has actions assigned to the keys, which max number in the preset
 
 Download the zip file from this site:
 
-https://github.com/RafalBuchner/blastpad/releases/download/v0.0.0.1-alpha/BlastPadControl.macOS.zip
+https://github.com/RafalBuchner/worldpad/releases/download/v0.0.0.1-alpha/WorldPadControl.macOS.zip
 
-Or go to the main GitHub page of this project (https://github.com/RafalBuchner/blastpad) and look for the link in the download section of the documentation.
+Or go to the main GitHub page of this project (https://github.com/RafalBuchner/worldpad) and look for the link in the download section of the documentation.
 
-Inside the unzipped folder you will find BlastPadControl executable file. Double click on it. The window like one below should appear:
+Inside the unzipped folder you will find WorldPadControl executable file. Double click on it. The window like one below should appear:
 
 ![BlastApp](Photos/BlastApp.png)
 
@@ -82,13 +82,13 @@ This is the **Preset** Editor. It is divided into two sections. One is responsib
 
 ### Key Actions Section
 
-**The Key Actions Section**'s buttons recreates the **BlastPad**'s keyboard layout. If you click on the one of the buttons, the popup window will appear.
+**The Key Actions Section**'s buttons recreates the **WorldPad**'s keyboard layout. If you click on the one of the buttons, the popup window will appear.
 
 ![BlastApp-HotKeyPopUp](Photos/BlastApp-HotKeyPopUp.png)
 
 In this window you can assign pressed keystroke sequence to the previously selected button on the **Key Action Section**.
 
-Simply press some keystroke sequence on your everyday-regular-keyboard and press "ok" button (**IMPORTANT**: Pacience, This keystroke won't be triggered by the corresponding key on the **BLASTPad** device yet – we will talk about saving presets onto the device soon).
+Simply press some keystroke sequence on your everyday-regular-keyboard and press "ok" button (**IMPORTANT**: Pacience, This keystroke won't be triggered by the corresponding key on the **WORLDPad** device yet – we will talk about saving presets onto the device soon).
 
 This way you can edit all of the buttons on the **Key Action Section** layout. It is super easy.
 
@@ -98,7 +98,7 @@ This way you can edit all of the buttons on the **Key Action Section** layout. I
 
 - To create a new **Encoder Action** hit _"add encoder"_ button. It will create a new row.
 
-- Double click on the cell with the title "new encoder" to set the **Encoder Action**'s name that will appear on the **BLASTPad**'s display.
+- Double click on the cell with the title "new encoder" to set the **Encoder Action**'s name that will appear on the **WORLDPad**'s display.
 
 - Click on one of the hotkey cells to assign keystroke sequence.
 
@@ -118,9 +118,9 @@ If you want to have additional hotkey slots created, hit _"add hotkey"_ button. 
 
 You save **Presets** as separate files with \*_.json_ extension.
 
-Press _Save_ button to create a **Preset** file. In order to save preset on your **BLASTPad** find the usb device with the same name and save the **Preset** into _"Configs"_ folder. The name of the file will be used as a **Preset Title** on the **BlastPad**'s display, so name it accordingly to your needs.
+Press _Save_ button to create a **Preset** file. In order to save preset on your **WORLDPad** find the usb device with the same name and save the **Preset** into _"Configs"_ folder. The name of the file will be used as a **Preset Title** on the **WorldPad**'s display, so name it accordingly to your needs.
 
-### Changing the active Presets on the BlastPad device.
+### Changing the active Presets on the WorldPad device.
 
 If you have more than one **Presets** you will be able to swich between the presets whenever you like!
 
@@ -136,20 +136,20 @@ Firmware supports CircuitPython 10.1.4 for PICO rp2024.
 
 # building (depricated) python software
 
-This repository uses uv package manager. Install nescessary dependencies using `uv sync`, then run `v run pyinstaller --windowed ${PWD}/software/BlastPad.py --icon ${PWD}/software/BlastPad.icns`. It will create a an app in **/Users/rafalbuchner/repos/blastpad/dist** directory.
+This repository uses uv package manager. Install nescessary dependencies using `uv sync`, then run `v run pyinstaller --windowed ${PWD}/software/WorldPad.py --icon ${PWD}/software/WorldPad.icns`. It will create a an app in **/Users/rafalbuchner/repos/worldpad/dist** directory.
 
 # Downloads
 
-## BlastPadControl
+## WorldPadControl
 
-### [MacOS Download link](https://github.com/RafalBuchner/blastpad/releases/download/v0.0.0.1-alpha/BlastPadControl.macOS.zip)
+### [MacOS Download link](https://github.com/RafalBuchner/worldpad/releases/download/v0.0.0.1-alpha/WorldPadControl.macOS.zip)
 
 ## Photos
 
-![BlastPad_300x300](/Photos/BlastPad_300x300.jpg)
+![WorldPad_300x300](/Photos/WorldPad_300x300.jpg)
 
-![BlastPad1_300x300](/Photos/BlastPad1_300x300.jpg)
+![WorldPad1_300x300](/Photos/WorldPad1_300x300.jpg)
 
-![BlastPad2_300x300](/Photos/BlastPad2_300x300.jpg)
+![WorldPad2_300x300](/Photos/WorldPad2_300x300.jpg)
 
-![BlastPad3_300x300](/Photos/BlastPad3_300x300.jpg)
+![WorldPad3_300x300](/Photos/WorldPad3_300x300.jpg)
