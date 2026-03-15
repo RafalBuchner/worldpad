@@ -1,2 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: ["worldpad --default"];
+}
+
+[data-theme="worldpad"] {
+  color-scheme: dark;
+  --color-base-100: #161616;
+  --color-base-200: #0e0e0e;
+  --color-base-300: #222222;
+  --color-base-content: #eeeeee;
+  --color-primary: #e03030;
+  --color-primary-content: #ffffff;
+  --color-secondary: #222222;
+  --color-secondary-content: #eeeeee;
+  --color-accent: #ff4444;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1a1a1a;
+  --color-neutral-content: #cccccc;
+  --color-info: #3b82f6;
+  --color-info-content: #ffffff;
+  --color-success: #22c55e;
+  --color-success-content: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-content: #000000;
+  --color-error: #e03030;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.25rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.375rem;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.font-mono {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+[data-theme="worldpad"] .btn:focus-visible,
+[data-theme="worldpad"] .btn:has(:focus-visible) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="worldpad"] .btn {
+  outline-color: transparent;
+  --depth: 0;
+}
+
+[data-theme="worldpad"] .btn-outline {
+  --border: 1px;
+}

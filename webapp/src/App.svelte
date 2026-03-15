@@ -363,17 +363,21 @@
 
 <!-- Fixed top-left logo -->
 <div
-  class="fixed left-0 top-0 w-72 p-6 text-base-content [&>svg]:w-full [&>svg]:h-auto pointer-events-none"
+  class="fixed left-0 top-0 w-72 p-6 text-primary [&>svg]:w-full [&>svg]:h-auto pointer-events-none"
 >
   {@html logoSvg}
 </div>
 
-<div class="min-h-screen bg-base-200 p-6">
+<div class="min-h-screen bg-base-200 p-8 pb-16">
   <div class="max-w-2xl mx-auto space-y-4">
     <!-- Key Actions -->
-    <div class="card bg-base-100 shadow">
+    <div class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
-        <h2 class="card-title text-base">Key Actions</h2>
+        <h2
+          class="text-xs font-semibold uppercase tracking-widest text-primary mb-1"
+        >
+          Key Actions
+        </h2>
 
         <!-- Hidden input: the real keyboard capture target for key buttons -->
         <input
@@ -400,12 +404,12 @@
           {#each KEY_LAYOUT as [keyIdx, span]}
             {@const isEditing = editingKeyIndex === keyIdx}
             <button
-              class="rounded w-full text-sm font-mono leading-tight p-1 cursor-pointer
+              class="rounded w-full text-lg font-mono leading-tight p-1 cursor-pointer
                      flex items-center justify-center text-center transition-all
                      {span === 1 ? 'aspect-[3/2]' : ''}
                      {isEditing
                 ? 'relative z-20 bg-primary text-primary-content border-2 border-primary animate-pulse'
-                : 'bg-base-100 border border-base-300 hover:bg-base-200 active:translate-y-px'}"
+                : 'bg-base-100 border border-base-300 hover:bg-white/10 active:translate-y-px text-primary'}"
               style="grid-column: span {span};"
               onclick={() => startEditing(keyIdx)}
             >
@@ -429,7 +433,7 @@
                     >+</span
                   >{/if}
                 <button
-                  class="badge badge-neutral font-mono text-sm h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
+                  class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
                   onclick={() => {
                     pickedKeys = pickedKeys.filter((_, j) => j !== i);
                     captureInputEl?.focus();
@@ -480,7 +484,7 @@
                           class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
                           onclick={() => appendToPickedKey(key.sym)}
                         >
-                          <span class="text-sm leading-none">{key.sym}</span>
+                          <span class="text-2xl leading-none">{key.sym}</span>
                           {#if key.name !== key.sym}<span
                               class="text-[9px] opacity-50 font-sans normal-case leading-tight"
                               >{key.name}</span
@@ -502,9 +506,13 @@
     </div>
 
     <!-- Encoder Actions -->
-    <div class="card bg-base-100 shadow">
+    <div class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
-        <h2 class="card-title text-base">Encoder Actions</h2>
+        <h2
+          class="text-xs font-semibold uppercase tracking-widest text-primary mb-1"
+        >
+          Encoder Actions
+        </h2>
 
         <!-- Hidden input: keyboard capture target for encoder hotkeys -->
         <input
@@ -532,7 +540,7 @@
         >
           <table class="table table-zebra table-sm w-full">
             <thead>
-              <tr>
+              <tr class="text-primary">
                 <th>name</th>
                 {#each Array(maxHotkeys) as _, i}
                   <th>hotkey {i + 1}</th>
@@ -575,7 +583,7 @@
                       editingEncoderHotkey?.rowIdx === rowIdx &&
                       editingEncoderHotkey?.colIdx === colIdx}
                     <td
-                      class="font-mono"
+                      class="font-mono text-xl tracking-widest"
                       class:relative={isActive}
                       class:z-20={isActive}
                       class:ring={isActive}
@@ -606,7 +614,7 @@
                     >+</span
                   >{/if}
                 <button
-                  class="badge badge-neutral font-mono text-sm h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
+                  class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
                   onclick={() => {
                     encoderPickedKeys = encoderPickedKeys.filter(
                       (_, j) => j !== i,
@@ -659,7 +667,7 @@
                           class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
                           onclick={() => appendToEncoderPickedKey(key.sym)}
                         >
-                          <span class="text-sm leading-none">{key.sym}</span>
+                          <span class="text-2xl leading-none">{key.sym}</span>
                           {#if key.name !== key.sym}<span
                               class="text-[9px] opacity-50 font-sans normal-case leading-tight"
                               >{key.name}</span
@@ -692,35 +700,32 @@
       </div>
     </div>
 
-    <!-- Load / Save -->
-    <div class="card bg-base-100 shadow">
-      <div class="card-body">
-        <div class="flex flex-wrap gap-2 items-center">
-          <input
-            bind:this={fileInput}
-            type="file"
-            accept=".json"
-            class="hidden"
-            onchange={onFileChange}
-          />
-          <button
-            class="btn btn-sm btn-outline"
-            onclick={() => fileInput.click()}>load</button
-          >
-          <div class="flex gap-1 items-center">
-            <input
-              type="text"
-              class="input input-bordered input-sm w-36"
-              bind:value={saveFileName}
-              placeholder="filename"
-            />
-            <span class="text-base-content/40 text-sm">.json</span>
-          </div>
-          <button class="btn btn-sm btn-primary" onclick={saveToFile}
-            >save</button
-          >
-        </div>
-      </div>
-    </div>
   </div>
+</div>
+
+<!-- Bottom status bar -->
+<div class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 px-8 py-2.5 flex items-center justify-end gap-3 text-sm font-mono z-50">
+  <input
+    bind:this={fileInput}
+    type="file"
+    accept=".json"
+    class="hidden"
+    onchange={onFileChange}
+  />
+  <input
+    type="text"
+    class="bg-transparent text-base-content/50 focus:text-base-content focus:outline-none w-32 transition-colors"
+    bind:value={saveFileName}
+    placeholder="preset"
+  /><span class="text-base-content/30">.json</span>
+  <span class="text-base-content/20 select-none">·</span>
+  <button
+    class="text-base-content/40 hover:text-primary transition-colors"
+    onclick={saveToFile}>save</button
+  >
+  <span class="text-base-content/20 select-none">·</span>
+  <button
+    class="text-base-content/40 hover:text-base-content transition-colors"
+    onclick={() => fileInput.click()}>load</button
+  >
 </div>
