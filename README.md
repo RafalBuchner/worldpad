@@ -136,7 +136,7 @@ Firmware supports CircuitPython 10.1.4 for PICO rp2024.
 
 # building (depricated) python software
 
-This repository uses uv package manager. Install nescessary dependencies using `uv sync`, then run `v run pyinstaller --windowed ${PWD}/software/WorldPad.py --icon ${PWD}/software/WorldPad.icns`. It will create a an app in **/Users/rafalbuchner/repos/worldpad/dist** directory.
+This repository uses uv package manager. Install nescessary dependencies using `uv sync`, then run `uv run pyinstaller --windowed ${PWD}/software/WorldPad.py --icon ${PWD}/software/WorldPad.icns`. It will create a an app in **/Users/rafalbuchner/repos/worldpad/dist** directory.
 
 # Downloads
 

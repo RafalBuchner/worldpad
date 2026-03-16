@@ -14,8 +14,16 @@ from adafruit_debouncer import Debouncer
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
+from adafruit_hid.consumer_control import ConsumerControl
+from adafruit_hid.consumer_control_code import ConsumerControlCode
 from minikbd import MiniKbdButtons
 import i2cdisplaybus
+
+def parseShortcut(names):
+	if names and names[0].startswith("CC_"):
+		return ('cc', getattr(ConsumerControlCode, names[0][3:]))
+	return ('kbd', [getattr(Keycode, name) for name in names])
+
 
 def divideListIntoUIChunks(l):
 	div_l = []
@@ -54,8 +62,7 @@ def initOptions():
 			shortcuts = []
 
 			for shortcutSet in mappingDict['shortcuts']:
-				shortcutSetObj = [getattr(Keycode, name) for name in shortcutSet]
-				shortcuts.append(shortcutSetObj)
+				shortcuts.append(parseShortcut(shortcutSet))
 			mappingDict['shortcuts'] = shortcuts
 
 			wheels = {}
@@ -63,14 +70,11 @@ def initOptions():
 			for wheelTitle, wheelset in mappingDict['wheels'].items():
 				if len(wheelset) == 2:
 					wheelLeft, wheelRight = wheelset
-					wheelLeftObj = [getattr(Keycode, name) for name in wheelLeft]
-					wheelRightObj = [getattr(Keycode, name) for name in wheelRight]
-					wheels[wheelTitle] = wheelLeftObj, wheelRightObj
+					wheels[wheelTitle] = parseShortcut(wheelLeft), parseShortcut(wheelRight)
 				else:
 					wheelShortcuts = []
 					for wheelShortcut in wheelset:
-						wheelObjs = [getattr(Keycode, name) for name in wheelShortcut]
-						wheelShortcuts.append(wheelObjs)
+						wheelShortcuts.append(parseShortcut(wheelShortcut))
 					wheels[wheelTitle] = wheelShortcuts
 			mappingDict['wheels'] = wheels
 			if "cache" not in mappingDict.keys():
@@ -120,6 +124,7 @@ class MacroPadUI:
 					allowWheelConfChangeSwitchPin="GP0"
 				):
 		self.kbd = Keyboard(usb_hid.devices)
+		self.cc = ConsumerControl(usb_hid.devices)
 		self.buttonMatrix = MiniKbdButtons(
 									keyDownCallback=self.buttonDownCallback, 
 									keyUpCallback=self.buttonUpCallback
@@ -235,12 +240,25 @@ class MacroPadUI:
 		text_group.append(self.text_area)
 		splash.append(text_group)
 
+	def _sendShortcut(self, shortcut):
+		if shortcut[0] == 'cc':
+			self.cc.send(shortcut[1])
+		elif shortcut[1]:
+			self.kbd.press(*shortcut[1])
+			self.kbd.release(*shortcut[1])
+
 	def buttonDownCallback(self, buttonID, othersDown):
-		self.kbd.press(*self.shortcutList[buttonID-1])
+		shortcut = self.shortcutList[buttonID-1]
+		if shortcut[0] == 'cc':
+			self.cc.send(shortcut[1])
+		elif shortcut[1]:
+			self.kbd.press(*shortcut[1])
 		print("btn _down_", buttonID, othersDown)
 
 	def buttonUpCallback(self, buttonID):
-		self.kbd.release(*self.shortcutList[buttonID-1])
+		shortcut = self.shortcutList[buttonID-1]
+		if shortcut[0] == 'kbd' and shortcut[1]:
+			self.kbd.release(*shortcut[1])
 		print("btn ^UPUP^", buttonID)
 
 	def updateAllowWheel(self):
@@ -297,45 +315,36 @@ class MacroPadUI:
 	
 	def en1ActionUp(self):
 		if self.isEnc1LeftRight:
-			self.kbd.press(*self.enc1Actions[0])
-			self.kbd.release(*self.enc1Actions[0])
+			self._sendShortcut(self.enc1Actions[0])
 		else:
-			self.kbd.press(*self.enc1Actions[self.enc1CarouselIndex])
-			self.kbd.release(*self.enc1Actions[self.enc1CarouselIndex])
+			self._sendShortcut(self.enc1Actions[self.enc1CarouselIndex])
 			self.enc1CarouselIndex -= 1
 			if self.enc1CarouselIndex == -1:
 				self.enc1CarouselIndex = self.enc1ListLength-1
 
 	def en1ActionDown(self):
 		if self.isEnc1LeftRight:
-			self.kbd.press(*self.enc1Actions[1])
-			self.kbd.release(*self.enc1Actions[1])
+			self._sendShortcut(self.enc1Actions[1])
 		else:
-			self.kbd.press(*self.enc1Actions[self.enc1CarouselIndex])
-			self.kbd.release(*self.enc1Actions[self.enc1CarouselIndex])
+			self._sendShortcut(self.enc1Actions[self.enc1CarouselIndex])
 			self.enc1CarouselIndex += 1
 			if self.enc1CarouselIndex == self.enc1ListLength:
 				self.enc1CarouselIndex = 0
-		
 
 	def en2ActionUp(self):
 		if self.isEnc2LeftRight:
-			self.kbd.press(*self.enc2Actions[0])
-			self.kbd.release(*self.enc2Actions[0])
+			self._sendShortcut(self.enc2Actions[0])
 		else:
-			self.kbd.press(*self.enc2Actions[self.enc2CarouselIndex])
-			self.kbd.release(*self.enc2Actions[self.enc2CarouselIndex])
+			self._sendShortcut(self.enc2Actions[self.enc2CarouselIndex])
 			self.enc2CarouselIndex -= 1
 			if self.enc2CarouselIndex == -1:
 				self.enc2CarouselIndex = self.enc2ListLength-1
-		
+
 	def en2ActionDown(self):
 		if self.isEnc2LeftRight:
-			self.kbd.press(*self.enc2Actions[1])
-			self.kbd.release(*self.enc2Actions[1])
+			self._sendShortcut(self.enc2Actions[1])
 		else:
-			self.kbd.press(*self.enc2Actions[self.enc2CarouselIndex])
-			self.kbd.release(*self.enc2Actions[self.enc2CarouselIndex])
+			self._sendShortcut(self.enc2Actions[self.enc2CarouselIndex])
 			self.enc2CarouselIndex += 1
 			if self.enc2CarouselIndex == self.enc2ListLength:
 				self.enc2CarouselIndex = 0

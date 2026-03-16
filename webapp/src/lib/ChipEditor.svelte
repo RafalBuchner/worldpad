@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { SYSTEM_KEY_SYMBOLS } from "./keyMappings.js";
-  import { SPECIAL_KEY_GROUPS, fmtKey, buildChipsFromEvent } from "./chipUtils.js";
+  import { SPECIAL_KEY_GROUPS, MEDIA_KEY_SYMS, fmtKey, buildChipsFromEvent } from "./chipUtils.js";
 
   let {
     pickedKeys = $bindable([]),
@@ -13,11 +13,14 @@
   let showPicker = $state(false);
   let captureInputEl = $state(null);
 
+  const hasMediaKey = $derived(pickedKeys.some(k => MEDIA_KEY_SYMS.has(k)));
+
   onMount(() => {
     setTimeout(() => captureInputEl?.focus(), 0);
   });
 
   function captureKey(event) {
+    if (hasMediaKey) { event.preventDefault(); event.stopPropagation(); return; }
     const MODIFIER_MAP = { Control: "Control", Shift: "Shift", Alt: "Option", Meta: "Command" };
     if (MODIFIER_MAP[event.key]) {
       event.preventDefault();
@@ -30,7 +33,11 @@
   }
 
   function appendKey(sym) {
-    pickedKeys = [...pickedKeys, sym];
+    if (MEDIA_KEY_SYMS.has(sym)) {
+      pickedKeys = [sym];
+    } else if (!hasMediaKey) {
+      pickedKeys = [...pickedKeys, sym];
+    }
     captureInputEl?.focus();
   }
 
@@ -67,10 +74,10 @@
         {/each}
         {#if pickedKeys.length === 0}
           <span class="text-base-content/30 text-xs italic">press a key or pick from below…</span>
+        {:else if hasMediaKey}
+          <span class="text-base-content/30 text-xs italic ml-1">media keys are standalone · click chip to remove</span>
         {:else}
-          <span class="text-base-content/30 text-xs italic ml-1"
-            >press a key to replace · click chip to remove</span
-          >
+          <span class="text-base-content/30 text-xs italic ml-1">press a key to replace · click chip to remove</span>
         {/if}
       </div>
       <div class="flex items-center gap-2">
@@ -100,7 +107,7 @@
           <div class="flex flex-wrap gap-1">
             {#each group.keys as key}
               <button
-                class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
+                class="h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10 rounded cursor-pointer hover:bg-white/10 transition-colors disabled:opacity-30"
                 onclick={() => appendKey(key.sym)}
               >
                 <span class="text-2xl leading-none">{@html fmtKey(key.sym)}</span>

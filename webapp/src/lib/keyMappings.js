@@ -26,7 +26,20 @@ export const QT_TO_ADAFRUIT = {
   "Keypad_Enter": "KEYPAD_ENTER", "Keypad_Plus": "KEYPAD_PLUS",
   "Keypad_Minus": "KEYPAD_MINUS", "Keypad_Asterisk": "KEYPAD_ASTERISK",
   "Keypad_Slash": "KEYPAD_FORWARD_SLASH", "Keypad_Equals": "KEYPAD_EQUALS",
-  "Keypad_Numlock": "KEYPAD_NUMLOCK"
+  "Keypad_Numlock": "KEYPAD_NUMLOCK",
+  // Media / Consumer Control keys (stored as CC_ prefix in JSON)
+  "Play/Pause": "CC_PLAY_PAUSE",
+  "Stop": "CC_STOP",
+  "Next Track": "CC_SCAN_NEXT_TRACK",
+  "Prev Track": "CC_SCAN_PREVIOUS_TRACK",
+  "Fast Fwd": "CC_FAST_FORWARD",
+  "Rewind": "CC_REWIND",
+  "Vol+": "CC_VOLUME_INCREMENT",
+  "Vol-": "CC_VOLUME_DECREMENT",
+  "Mute": "CC_MUTE",
+  "Brt+": "CC_BRIGHTNESS_INCREMENT",
+  "Brt-": "CC_BRIGHTNESS_DECREMENT",
+  "Eject": "CC_EJECT"
 };
 
 export const QT_TO_ADAFRUIT_Inverted = Object.fromEntries(
@@ -60,7 +73,20 @@ export const SYSTEM_KEY_SYMBOLS = {
   "PgDown": "⇟",
   "PgUp": "⇞",
   "Tab": "⇥",
-  "CapsLock": "⇪"
+  "CapsLock": "⇪",
+  // Media keys
+  "Play/Pause": "⏯",
+  "Stop": "⏹",
+  "Next Track": "⏭",
+  "Prev Track": "⏮",
+  "Fast Fwd": "⏩",
+  "Rewind": "⏪",
+  "Vol+": "🔊",
+  "Vol-": "🔉",
+  "Mute": "🔇",
+  "Brt+": "Brt+",
+  "Brt-": "Brt-",
+  "Eject": "⏏"
 };
 
 export const SYSTEM_KEY_SYMBOLS_Inverted = Object.fromEntries(

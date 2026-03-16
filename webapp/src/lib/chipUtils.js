@@ -7,10 +7,10 @@ import {
 
 // Formats a key symbol for display — wraps "NUM" in small-caps styling
 export function fmtKey(k) {
-  return k.replace(
-    /\bNUM\b/g,
-    "<span style=\"font-feature-settings:'smcp';opacity:0.7\">num</span>",
-  );
+  const smcp = "<span style=\"font-feature-settings:'smcp';opacity:0.7\">num</span>";
+  return k
+    .replace(/ NUM\b/g, `-${smcp}`)
+    .replace(/\bNUM\b/g, smcp);
 }
 
 // Builds a chip array from a keyboard event; returns null for modifier-only presses
@@ -43,6 +43,10 @@ export function buildChipsFromEvent(event) {
   if (event.shiftKey && SHIFT_FIX[physicalKey]) mainKey = SHIFT_FIX[physicalKey];
   return [...modifiers, mainKey].map((k) => SYSTEM_KEY_SYMBOLS[k] ?? k);
 }
+
+export const MEDIA_KEY_SYMS = new Set([
+  "⏯", "⏹", "⏭", "⏮", "⏩", "⏪", "🔊", "🔉", "🔇", "Brt+", "Brt-", "⏏"
+]);
 
 export const SPECIAL_KEY_GROUPS = [
   {
@@ -96,6 +100,23 @@ export const SPECIAL_KEY_GROUPS = [
       { sym: "/ NUM", name: "/ NUM" },
       { sym: "= NUM", name: "= NUM" },
       { sym: "NUM LK", name: "Num Lock" },
+    ],
+  },
+  {
+    label: "Media",
+    keys: [
+      { sym: "⏯", name: "Play/Pause" },
+      { sym: "⏹", name: "Stop" },
+      { sym: "⏭", name: "Next Track" },
+      { sym: "⏮", name: "Prev Track" },
+      { sym: "⏩", name: "Fast Fwd" },
+      { sym: "⏪", name: "Rewind" },
+      { sym: "🔊", name: "Vol+" },
+      { sym: "🔉", name: "Vol-" },
+      { sym: "🔇", name: "Mute" },
+      { sym: "Brt+", name: "Brt+" },
+      { sym: "Brt-", name: "Brt-" },
+      { sym: "⏏", name: "Eject" },
     ],
   },
 ];

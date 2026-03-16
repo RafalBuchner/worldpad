@@ -49,6 +49,7 @@ body {
 [data-theme="worldpad"] .btn {
   outline-color: transparent;
   --depth: 0;
+  text-shadow: none !important;
 }
 
 [data-theme="worldpad"] .btn-outline {
