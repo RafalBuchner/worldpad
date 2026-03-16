@@ -7,6 +7,7 @@
     SYSTEM_KEY_SYMBOLS,
     SHIFT_FIX,
     BROWSER_KEY_TO_INTERNAL,
+    BROWSER_CODE_TO_INTERNAL,
   } from "./lib/keyMappings.js";
   import logoSvg from "./lib/worldpad-logo.svg?raw";
 
@@ -111,13 +112,30 @@
       })),
     },
     {
-      label: "0–9",
-      keys: Array.from({ length: 10 }, (_, i) => ({
-        sym: String(i),
-        name: String(i),
-      })),
+      label: "Numpad",
+      keys: [
+        ...Array.from({ length: 10 }, (_, i) => ({
+          sym: `${i} NUM`,
+          name: `${i} NUM`,
+        })),
+        { sym: ". NUM", name: ". NUM" },
+        { sym: "⌤ NUM", name: "⌤ NUM" },
+        { sym: "+ NUM", name: "+ NUM" },
+        { sym: "- NUM", name: "- NUM" },
+        { sym: "* NUM", name: "* NUM" },
+        { sym: "/ NUM", name: "/ NUM" },
+        { sym: "= NUM", name: "= NUM" },
+        { sym: "NUM LK", name: "Num Lock" },
+      ],
     },
   ];
+
+  function fmtKey(k) {
+    return k.replace(
+      /\bNUM\b/g,
+      "<span style=\"font-feature-settings:'smcp';opacity:0.7\">num</span>",
+    );
+  }
 
   // Shared key capture logic — returns chip array from a keyboard event, or null for modifier-only
   function buildChipsFromEvent(event) {
@@ -136,15 +154,26 @@
     if (event.shiftKey) modifiers.push("Shift");
     if (event.altKey) modifiers.push("Option");
     if (event.metaKey) modifiers.push("Command");
+    // Numpad keys: detect via event.code since event.key is ambiguous (same as regular digits)
+    if (BROWSER_CODE_TO_INTERNAL[event.code]) {
+      const mainKey = BROWSER_CODE_TO_INTERNAL[event.code];
+      return [...modifiers, mainKey].map((k) => SYSTEM_KEY_SYMBOLS[k] ?? k);
+    }
     // When Alt/Option is held, event.key may be a dead/composed character (e.g. "ą" for Option+A).
     // Use event.code to recover the physical key instead.
-    const physicalKey = event.altKey && key.length === 1 && !BROWSER_KEY_TO_INTERNAL[key]
-      ? (event.code.startsWith("Key") ? event.code.slice(3) : event.code.startsWith("Digit") ? event.code.slice(5) : key.toUpperCase())
-      : key;
+    const physicalKey =
+      event.altKey && key.length === 1 && !BROWSER_KEY_TO_INTERNAL[key]
+        ? event.code.startsWith("Key")
+          ? event.code.slice(3)
+          : event.code.startsWith("Digit")
+            ? event.code.slice(5)
+            : key.toUpperCase()
+        : key;
     let mainKey =
       BROWSER_KEY_TO_INTERNAL[physicalKey] ??
       (physicalKey.length === 1 ? physicalKey.toUpperCase() : physicalKey);
-    if (event.shiftKey && SHIFT_FIX[physicalKey]) mainKey = SHIFT_FIX[physicalKey];
+    if (event.shiftKey && SHIFT_FIX[physicalKey])
+      mainKey = SHIFT_FIX[physicalKey];
     return [...modifiers, mainKey].map((k) => SYSTEM_KEY_SYMBOLS[k] ?? k);
   }
 
@@ -241,9 +270,11 @@
   }
 
   function confirmEncoderHotkey() {
-    if (encoderPickedKeys.length > 0 && editingEncoderHotkey !== null) {
+    if (editingEncoderHotkey !== null) {
       const { rowIdx, colIdx } = editingEncoderHotkey;
-      if (colIdx >= encoders[rowIdx].hotkeys.length) {
+      if (encoderPickedKeys.length === 0) {
+        encoders[rowIdx].hotkeys.splice(colIdx, 1);
+      } else if (colIdx >= encoders[rowIdx].hotkeys.length) {
         encoders[rowIdx].hotkeys.push([...encoderPickedKeys]);
       } else {
         encoders[rowIdx].hotkeys[colIdx] = [...encoderPickedKeys];
@@ -411,7 +442,7 @@
             <button
               class="rounded w-full text-lg font-mono leading-tight p-1 cursor-pointer
                      flex items-center justify-center text-center transition-all
-                     {span === 1 ? 'aspect-[3/2]' : ''}
+                     {span === 1 ? 'aspect-square' : ''}
                      {isEditing
                 ? 'relative z-20 bg-primary text-primary-content border-2 border-primary animate-pulse'
                 : 'bg-base-100 border border-base-300 hover:bg-white/10 active:translate-y-px text-primary'}"
@@ -419,9 +450,11 @@
               onclick={() => startEditing(keyIdx)}
             >
               {#if isEditing}
-                {pickedKeys.length > 0 ? pickedKeys.join("+") : "…"}
+                {@html pickedKeys.length > 0
+                  ? pickedKeys.map(fmtKey).join("+")
+                  : "…"}
               {:else}
-                {hotkeys[keyIdx].join("+")}
+                {@html hotkeys[keyIdx].map(fmtKey).join("+")}
               {/if}
             </button>
           {/each}
@@ -446,7 +479,8 @@
                         captureInputEl?.focus();
                       }}
                       title="Click to remove"
-                      >{key} <span class="opacity-40 text-xs">×</span></button
+                      >{@html fmtKey(key)}
+                      <span class="opacity-40 text-xs">×</span></button
                     >
                   {/each}
                   {#if pickedKeys.length === 0}
@@ -494,7 +528,9 @@
                           class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
                           onclick={() => appendToPickedKey(key.sym)}
                         >
-                          <span class="text-2xl leading-none">{key.sym}</span>
+                          <span class="text-2xl leading-none"
+                            >{@html fmtKey(key.sym)}</span
+                          >
                           {#if key.name !== key.sym}<span
                               class="text-[9px] opacity-50 font-sans normal-case leading-tight"
                               >{key.name}</span
@@ -603,7 +639,8 @@
                         startEditingEncoderHotkey(rowIdx, colIdx)}
                       onclick={(e) => e.stopPropagation()}
                     >
-                      {encoder.hotkeys[colIdx]?.join("+") ?? ""}
+                      {@html encoder.hotkeys[colIdx]?.map(fmtKey).join("+") ??
+                        ""}
                     </td>
                   {/each}
                 </tr>
@@ -634,7 +671,8 @@
                         encoderCaptureInputEl?.focus();
                       }}
                       title="Click to remove"
-                      >{key} <span class="opacity-40 text-xs">×</span></button
+                      >{@html fmtKey(key)}
+                      <span class="opacity-40 text-xs">×</span></button
                     >
                   {/each}
                   {#if encoderPickedKeys.length === 0}
@@ -661,7 +699,6 @@
               </div>
               <button
                 class="btn btn-primary px-6 h-auto self-stretch rounded"
-                disabled={encoderPickedKeys.length === 0}
                 onclick={confirmEncoderHotkey}>set</button
               >
             </div>
@@ -682,7 +719,9 @@
                           class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
                           onclick={() => appendToEncoderPickedKey(key.sym)}
                         >
-                          <span class="text-2xl leading-none">{key.sym}</span>
+                          <span class="text-2xl leading-none"
+                            >{@html fmtKey(key.sym)}</span
+                          >
                           {#if key.name !== key.sym}<span
                               class="text-[9px] opacity-50 font-sans normal-case leading-tight"
                               >{key.name}</span
@@ -714,12 +753,13 @@
         {/if}
       </div>
     </div>
-
   </div>
 </div>
 
 <!-- Bottom status bar -->
-<div class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 px-8 py-2.5 flex items-center justify-end gap-3 text-sm font-mono z-50">
+<div
+  class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 px-8 py-2.5 flex items-center justify-end gap-3 text-sm font-mono z-50"
+>
   <input
     bind:this={fileInput}
     type="file"
