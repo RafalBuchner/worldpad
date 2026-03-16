@@ -4,11 +4,9 @@
     DEFAULT_ENCODERS,
     convertAdafruitConfigToSymbolic,
     convertSymbolicConfigToAdafruit,
-    SYSTEM_KEY_SYMBOLS,
-    SHIFT_FIX,
-    BROWSER_KEY_TO_INTERNAL,
-    BROWSER_CODE_TO_INTERNAL,
   } from "./lib/keyMappings.js";
+  import { fmtKey } from "./lib/chipUtils.js";
+  import ChipEditor from "./lib/ChipEditor.svelte";
   import logoSvg from "./lib/worldpad-logo.svg?raw";
 
   // --- Persist state in localStorage ---
@@ -41,191 +39,35 @@
   let selectedEncoderRow = $state(DEFAULT_ENCODERS.length > 0 ? 0 : -1);
 
   // --- Key button grid ---
+  // Each entry is [keyIndex, colSpan]; span defaults to 1
   const KEY_LAYOUT = [
-    [0, 1],
-    [1, 1],
-    [2, 1],
-    [3, 1],
-    [4, 1],
-    [5, 1],
-    [6, 1],
-    [7, 1],
-    [8, 1],
-    [9, 1],
-    [10, 1],
-    [11, 1],
-    [12, 1],
-    [13, 1],
-    [14, 1],
-    [15, 2],
-    [16, 1],
-    [17, 1],
-    [18, 1],
-    [19, 1],
-    [20, 1],
-    [21, 1],
-    [22, 2],
-  ];
-
-  // Special key picker groups (shared by both chip editors)
-  const SPECIAL_KEY_GROUPS = [
-    {
-      label: "Modifiers",
-      keys: [
-        { sym: "⌘", name: "Cmd" },
-        { sym: "⌃", name: "Ctrl" },
-        { sym: "⇧", name: "Shift" },
-        { sym: "⌥", name: "Option" },
-      ],
-    },
-    {
-      label: "Keys",
-      keys: [
-        { sym: "↵", name: "Return" },
-        { sym: "⌤", name: "Enter" },
-        { sym: "⎋", name: "Esc" },
-        { sym: "⌫", name: "Backspace" },
-        { sym: "⌦", name: "Delete" },
-        { sym: "⇥", name: "Tab" },
-        { sym: "⇪", name: "Caps Lock" },
-        { sym: "Space", name: "Space" },
-      ],
-    },
-    {
-      label: "Navigation",
-      keys: [
-        { sym: "↑", name: "Up" },
-        { sym: "↓", name: "Down" },
-        { sym: "←", name: "Left" },
-        { sym: "→", name: "Right" },
-        { sym: "↖", name: "Home" },
-        { sym: "↘", name: "End" },
-        { sym: "⇞", name: "Page Up" },
-        { sym: "⇟", name: "Page Down" },
-      ],
-    },
-    {
-      label: "F-keys",
-      keys: Array.from({ length: 12 }, (_, i) => ({
-        sym: `F${i + 1}`,
-        name: `F${i + 1}`,
-      })),
-    },
-    {
-      label: "Numpad",
-      keys: [
-        ...Array.from({ length: 10 }, (_, i) => ({
-          sym: `${i} NUM`,
-          name: `${i} NUM`,
-        })),
-        { sym: ". NUM", name: ". NUM" },
-        { sym: "⌤ NUM", name: "⌤ NUM" },
-        { sym: "+ NUM", name: "+ NUM" },
-        { sym: "- NUM", name: "- NUM" },
-        { sym: "* NUM", name: "* NUM" },
-        { sym: "/ NUM", name: "/ NUM" },
-        { sym: "= NUM", name: "= NUM" },
-        { sym: "NUM LK", name: "Num Lock" },
-      ],
-    },
-  ];
-
-  function fmtKey(k) {
-    return k.replace(
-      /\bNUM\b/g,
-      "<span style=\"font-feature-settings:'smcp';opacity:0.7\">num</span>",
-    );
-  }
-
-  // Shared key capture logic — returns chip array from a keyboard event, or null for modifier-only
-  function buildChipsFromEvent(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    const key = event.key;
-    const MODIFIER_MAP = {
-      Control: "Control",
-      Shift: "Shift",
-      Alt: "Option",
-      Meta: "Command",
-    };
-    if (MODIFIER_MAP[key]) return null; // modifier-only: caller shows preview
-    const modifiers = [];
-    if (event.ctrlKey) modifiers.push("Control");
-    if (event.shiftKey) modifiers.push("Shift");
-    if (event.altKey) modifiers.push("Option");
-    if (event.metaKey) modifiers.push("Command");
-    // Numpad keys: detect via event.code since event.key is ambiguous (same as regular digits)
-    if (BROWSER_CODE_TO_INTERNAL[event.code]) {
-      const mainKey = BROWSER_CODE_TO_INTERNAL[event.code];
-      return [...modifiers, mainKey].map((k) => SYSTEM_KEY_SYMBOLS[k] ?? k);
-    }
-    // When Alt/Option is held, event.key may be a dead/composed character (e.g. "ą" for Option+A).
-    // Use event.code to recover the physical key instead.
-    const physicalKey =
-      event.altKey && key.length === 1 && !BROWSER_KEY_TO_INTERNAL[key]
-        ? event.code.startsWith("Key")
-          ? event.code.slice(3)
-          : event.code.startsWith("Digit")
-            ? event.code.slice(5)
-            : key.toUpperCase()
-        : key;
-    let mainKey =
-      BROWSER_KEY_TO_INTERNAL[physicalKey] ??
-      (physicalKey.length === 1 ? physicalKey.toUpperCase() : physicalKey);
-    if (event.shiftKey && SHIFT_FIX[physicalKey])
-      mainKey = SHIFT_FIX[physicalKey];
-    return [...modifiers, mainKey].map((k) => SYSTEM_KEY_SYMBOLS[k] ?? k);
-  }
+     0,  1,  2,  3,  4,
+     5,  6,  7,  8,  9,
+    10, 11, 12, 13, 14,
+    [15, 2], 16, 17, 18,
+    19, 20, 21, [22, 2],
+  ].map((v) => (Array.isArray(v) ? v : [v, 1]));
 
   // --- Key button inline capture ---
   let editingKeyIndex = $state(null);
   let pickedKeys = $state([]);
-  let captureInputEl = $state(null);
-  let showKeyPicker = $state(false);
 
   function startEditing(keyIdx) {
     cancelEncoderHotkey();
     editingKeyIndex = keyIdx;
     pickedKeys = [...(hotkeys[keyIdx] ?? [])];
-    showKeyPicker = false;
-    setTimeout(() => captureInputEl?.focus(), 0);
   }
 
   function cancelEditing() {
     editingKeyIndex = null;
     pickedKeys = [];
-    showKeyPicker = false;
   }
 
   function confirmEditing() {
     if (pickedKeys.length > 0) {
       hotkeys[editingKeyIndex] = [...pickedKeys];
-      cancelEditing();
     }
-  }
-
-  function appendToPickedKey(sym) {
-    pickedKeys = [...pickedKeys, sym];
-    captureInputEl?.focus();
-  }
-
-  function captureKeyForButton(event) {
-    const MODIFIER_MAP = {
-      Control: "Control",
-      Shift: "Shift",
-      Alt: "Option",
-      Meta: "Command",
-    };
-    if (MODIFIER_MAP[event.key]) {
-      event.preventDefault();
-      event.stopPropagation();
-      pickedKeys = [
-        SYSTEM_KEY_SYMBOLS[MODIFIER_MAP[event.key]] ?? MODIFIER_MAP[event.key],
-      ];
-      return;
-    }
-    const chips = buildChipsFromEvent(event);
-    if (chips) pickedKeys = chips;
+    cancelEditing();
   }
 
   // --- Encoder inline editing ---
@@ -233,8 +75,6 @@
   let editingEncoderNameValue = $state("");
   let editingEncoderHotkey = $state(null); // { rowIdx, colIdx } or null
   let encoderPickedKeys = $state([]);
-  let encoderShowPicker = $state(false);
-  let encoderCaptureInputEl = $state(null);
 
   function startEditingEncoderName(rowIdx) {
     cancelEncoderHotkey();
@@ -259,14 +99,11 @@
     selectedEncoderRow = rowIdx;
     editingEncoderHotkey = { rowIdx, colIdx };
     encoderPickedKeys = [...(encoders[rowIdx].hotkeys[colIdx] ?? [])];
-    encoderShowPicker = false;
-    setTimeout(() => encoderCaptureInputEl?.focus(), 0);
   }
 
   function cancelEncoderHotkey() {
     editingEncoderHotkey = null;
     encoderPickedKeys = [];
-    encoderShowPicker = false;
   }
 
   function confirmEncoderHotkey() {
@@ -281,30 +118,6 @@
       }
       cancelEncoderHotkey();
     }
-  }
-
-  function appendToEncoderPickedKey(sym) {
-    encoderPickedKeys = [...encoderPickedKeys, sym];
-    encoderCaptureInputEl?.focus();
-  }
-
-  function captureKeyForEncoder(event) {
-    const MODIFIER_MAP = {
-      Control: "Control",
-      Shift: "Shift",
-      Alt: "Option",
-      Meta: "Command",
-    };
-    if (MODIFIER_MAP[event.key]) {
-      event.preventDefault();
-      event.stopPropagation();
-      encoderPickedKeys = [
-        SYSTEM_KEY_SYMBOLS[MODIFIER_MAP[event.key]] ?? MODIFIER_MAP[event.key],
-      ];
-      return;
-    }
-    const chips = buildChipsFromEvent(event);
-    if (chips) encoderPickedKeys = chips;
   }
 
   function removeEncoder(idx) {
@@ -325,7 +138,6 @@
   function addEncoder() {
     encoders.push({ name: "new encoder", hotkeys: [] });
     selectedEncoderRow = encoders.length - 1;
-    // Start editing the name immediately
     startEditingEncoderName(encoders.length - 1);
   }
 
@@ -336,6 +148,26 @@
       encoders[selectedEncoderRow].hotkeys.length,
     );
   }
+
+  const maxHotkeys = $derived.by(() => {
+    let max =
+      encoders.length === 0
+        ? 0
+        : Math.max(...encoders.map((e) => e.hotkeys.length), 0);
+    if (editingEncoderHotkey !== null && editingEncoderHotkey.colIdx >= max)
+      max = editingEncoderHotkey.colIdx + 1;
+    return max;
+  });
+
+  function focusOnMount(el) {
+    setTimeout(() => el.focus(), 0);
+  }
+
+  const selectedEncoderName = $derived(
+    selectedEncoderRow >= 0 && encoders[selectedEncoderRow]
+      ? encoders[selectedEncoderRow].name
+      : null,
+  );
 
   // --- Load / Save ---
   let fileInput = $state(null);
@@ -375,26 +207,6 @@
     a.click();
     URL.revokeObjectURL(url);
   }
-
-  const maxHotkeys = $derived.by(() => {
-    let max =
-      encoders.length === 0
-        ? 0
-        : Math.max(...encoders.map((e) => e.hotkeys.length), 0);
-    if (editingEncoderHotkey !== null && editingEncoderHotkey.colIdx >= max)
-      max = editingEncoderHotkey.colIdx + 1;
-    return max;
-  });
-
-  function focusOnMount(el) {
-    setTimeout(() => el.focus(), 0);
-  }
-
-  const selectedEncoderName = $derived(
-    selectedEncoderRow >= 0 && encoders[selectedEncoderRow]
-      ? encoders[selectedEncoderRow].name
-      : null,
-  );
 </script>
 
 <!-- Fixed top-left logo -->
@@ -409,21 +221,9 @@
     <!-- Key Actions -->
     <div class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
-        <h2
-          class="text-xs font-semibold uppercase tracking-widest text-primary mb-1"
-        >
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
           Key Actions
         </h2>
-
-        <!-- Hidden input: the real keyboard capture target for key buttons -->
-        <input
-          bind:this={captureInputEl}
-          class="sr-only"
-          type="text"
-          readonly
-          tabindex="-1"
-          onkeydown={captureKeyForButton}
-        />
 
         {#if editingKeyIndex !== null}
           <button
@@ -433,10 +233,7 @@
           ></button>
         {/if}
 
-        <div
-          class="grid gap-1 w-full"
-          style="grid-template-columns: repeat(5, 1fr);"
-        >
+        <div class="grid gap-1 w-full" style="grid-template-columns: repeat(5, 1fr);">
           {#each KEY_LAYOUT as [keyIdx, span]}
             {@const isEditing = editingKeyIndex === keyIdx}
             <button
@@ -450,9 +247,7 @@
               onclick={() => startEditing(keyIdx)}
             >
               {#if isEditing}
-                {@html pickedKeys.length > 0
-                  ? pickedKeys.map(fmtKey).join("+")
-                  : "…"}
+                {@html pickedKeys.length > 0 ? pickedKeys.map(fmtKey).join("+") : "…"}
               {:else}
                 {@html hotkeys[keyIdx].map(fmtKey).join("+")}
               {/if}
@@ -461,91 +256,13 @@
         </div>
 
         {#if editingKeyIndex !== null}
-          <div class="relative z-20 space-y-2">
-            <div class="flex gap-2 items-stretch">
-              <div class="flex-1 space-y-2">
-                <div
-                  class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
-                >
-                  {#each pickedKeys as key, i}
-                    {#if i > 0}<span
-                        class="text-base-content/30 text-xs select-none font-mono"
-                        >+</span
-                      >{/if}
-                    <button
-                      class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
-                      onclick={() => {
-                        pickedKeys = pickedKeys.filter((_, j) => j !== i);
-                        captureInputEl?.focus();
-                      }}
-                      title="Click to remove"
-                      >{@html fmtKey(key)}
-                      <span class="opacity-40 text-xs">×</span></button
-                    >
-                  {/each}
-                  {#if pickedKeys.length === 0}
-                    <span class="text-base-content/30 text-xs italic"
-                      >press a key or pick from below…</span
-                    >
-                  {:else}
-                    <span class="text-base-content/30 text-xs italic ml-1"
-                      >press a key to replace · click chip to remove</span
-                    >
-                  {/if}
-                </div>
-                <div class="flex items-center gap-2">
-                  <button
-                    class="btn btn-xs btn-ghost"
-                    onclick={() => {
-                      showKeyPicker = !showKeyPicker;
-                      captureInputEl?.focus();
-                    }}
-                  >
-                    keys {showKeyPicker ? "▴" : "▾"}
-                  </button>
-                  <button
-                    class="btn btn-error btn-xs ml-auto"
-                    onclick={cancelEditing}>cancel</button
-                  >
-                </div>
-              </div>
-              <button
-                class="btn btn-primary px-6 h-auto self-stretch rounded"
-                disabled={pickedKeys.length === 0}
-                onclick={confirmEditing}>set</button
-              >
-            </div>
-            {#if showKeyPicker}
-              <div
-                class="bg-base-200 rounded-box border border-base-300 p-3 space-y-2"
-              >
-                {#each SPECIAL_KEY_GROUPS as group}
-                  <div>
-                    <p
-                      class="text-[10px] text-base-content/40 uppercase tracking-wide mb-1"
-                    >
-                      {group.label}
-                    </p>
-                    <div class="flex flex-wrap gap-1">
-                      {#each group.keys as key}
-                        <button
-                          class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
-                          onclick={() => appendToPickedKey(key.sym)}
-                        >
-                          <span class="text-2xl leading-none"
-                            >{@html fmtKey(key.sym)}</span
-                          >
-                          {#if key.name !== key.sym}<span
-                              class="text-[9px] opacity-50 font-sans normal-case leading-tight"
-                              >{key.name}</span
-                            >{/if}
-                        </button>
-                      {/each}
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {/if}
+          <div class="relative z-20">
+            <ChipEditor
+              bind:pickedKeys
+              onConfirm={confirmEditing}
+              onCancel={cancelEditing}
+              confirmDisabled={pickedKeys.length === 0}
+            />
           </div>
         {:else}
           <p class="text-xs text-base-content/50 mt-1">
@@ -558,21 +275,9 @@
     <!-- Encoder Actions -->
     <div class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
-        <h2
-          class="text-xs font-semibold uppercase tracking-widest text-primary mb-1"
-        >
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
           Encoder Actions
         </h2>
-
-        <!-- Hidden input: keyboard capture target for encoder hotkeys -->
-        <input
-          bind:this={encoderCaptureInputEl}
-          class="sr-only"
-          type="text"
-          readonly
-          tabindex="-1"
-          onkeydown={captureKeyForEncoder}
-        />
 
         {#if editingEncoderHotkey !== null}
           <button
@@ -582,12 +287,7 @@
           ></button>
         {/if}
 
-        <div
-          class="overflow-x-auto outline-none"
-          role="grid"
-          tabindex="0"
-          onkeydown={tableKeyDown}
-        >
+        <div class="overflow-x-auto outline-none" role="grid" tabindex="0" onkeydown={tableKeyDown}>
           <table class="table table-zebra table-sm w-full">
             <thead>
               <tr class="text-primary">
@@ -603,11 +303,8 @@
                   class="cursor-pointer"
                   class:bg-primary={rowIdx === selectedEncoderRow}
                   class:text-primary-content={rowIdx === selectedEncoderRow}
-                  onclick={() => {
-                    selectedEncoderRow = rowIdx;
-                  }}
+                  onclick={() => { selectedEncoderRow = rowIdx; }}
                 >
-                  <!-- Name cell: inline editing on double-click -->
                   <td ondblclick={() => startEditingEncoderName(rowIdx)}>
                     {#if editingEncoderName === rowIdx}
                       <input
@@ -627,7 +324,6 @@
                       {encoder.name}
                     {/if}
                   </td>
-                  <!-- Hotkey cells: chip editor opens below on double-click -->
                   {#each Array(maxHotkeys) as _, colIdx}
                     {@const isActive =
                       editingEncoderHotkey?.rowIdx === rowIdx &&
@@ -639,12 +335,10 @@
                       class:ring={isActive}
                       class:ring-primary={isActive}
                       class:rounded={isActive}
-                      ondblclick={() =>
-                        startEditingEncoderHotkey(rowIdx, colIdx)}
+                      ondblclick={() => startEditingEncoderHotkey(rowIdx, colIdx)}
                       onclick={(e) => e.stopPropagation()}
                     >
-                      {@html encoder.hotkeys[colIdx]?.map(fmtKey).join("+") ??
-                        ""}
+                      {@html encoder.hotkeys[colIdx]?.map(fmtKey).join("+") ?? ""}
                     </td>
                   {/each}
                 </tr>
@@ -654,93 +348,12 @@
         </div>
 
         {#if editingEncoderHotkey !== null}
-          <!-- Encoder chip editor -->
-          <div class="relative z-20 space-y-2">
-            <div class="flex gap-2 items-stretch">
-              <div class="flex-1 space-y-2">
-                <div
-                  class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
-                >
-                  {#each encoderPickedKeys as key, i}
-                    {#if i > 0}<span
-                        class="text-base-content/30 text-xs select-none font-mono"
-                        >+</span
-                      >{/if}
-                    <button
-                      class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2 gap-1 cursor-pointer hover:badge-error transition-colors"
-                      onclick={() => {
-                        encoderPickedKeys = encoderPickedKeys.filter(
-                          (_, j) => j !== i,
-                        );
-                        encoderCaptureInputEl?.focus();
-                      }}
-                      title="Click to remove"
-                      >{@html fmtKey(key)}
-                      <span class="opacity-40 text-xs">×</span></button
-                    >
-                  {/each}
-                  {#if encoderPickedKeys.length === 0}
-                    <span class="text-base-content/30 text-xs italic"
-                      >press a key or pick from below…</span
-                    >
-                  {:else}
-                    <span class="text-base-content/30 text-xs italic ml-1"
-                      >press a key to replace · click chip to remove</span
-                    >
-                  {/if}
-                </div>
-                <div class="flex items-center gap-2">
-                  <button
-                    class="btn btn-xs btn-ghost"
-                    onclick={() => {
-                      encoderShowPicker = !encoderShowPicker;
-                      encoderCaptureInputEl?.focus();
-                    }}
-                  >
-                    keys {encoderShowPicker ? "▴" : "▾"}
-                  </button>
-                  <button
-                    class="btn btn-error btn-xs ml-auto"
-                    onclick={cancelEncoderHotkey}>cancel</button
-                  >
-                </div>
-              </div>
-              <button
-                class="btn btn-primary px-6 h-auto self-stretch rounded"
-                onclick={confirmEncoderHotkey}>set</button
-              >
-            </div>
-            {#if encoderShowPicker}
-              <div
-                class="bg-base-200 rounded-box border border-base-300 p-3 space-y-2"
-              >
-                {#each SPECIAL_KEY_GROUPS as group}
-                  <div>
-                    <p
-                      class="text-[10px] text-base-content/40 uppercase tracking-wide mb-1"
-                    >
-                      {group.label}
-                    </p>
-                    <div class="flex flex-wrap gap-1">
-                      {#each group.keys as key}
-                        <button
-                          class="btn btn-xs h-auto py-1 px-1.5 font-mono flex flex-col gap-0 min-w-10"
-                          onclick={() => appendToEncoderPickedKey(key.sym)}
-                        >
-                          <span class="text-2xl leading-none"
-                            >{@html fmtKey(key.sym)}</span
-                          >
-                          {#if key.name !== key.sym}<span
-                              class="text-[9px] opacity-50 font-sans normal-case leading-tight"
-                              >{key.name}</span
-                            >{/if}
-                        </button>
-                      {/each}
-                    </div>
-                  </div>
-                {/each}
-              </div>
-            {/if}
+          <div class="relative z-20">
+            <ChipEditor
+              bind:pickedKeys={encoderPickedKeys}
+              onConfirm={confirmEncoderHotkey}
+              onCancel={cancelEncoderHotkey}
+            />
           </div>
         {:else}
           <p class="text-xs text-base-content/50">
@@ -753,9 +366,7 @@
               disabled={selectedEncoderRow < 0}
               onclick={addHotkey}
             >
-              add hotkey{selectedEncoderName
-                ? ` to "${selectedEncoderName}"`
-                : ""}
+              add hotkey{selectedEncoderName ? ` to "${selectedEncoderName}"` : ""}
             </button>
           </div>
         {/if}
