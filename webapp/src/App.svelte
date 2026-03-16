@@ -7,7 +7,10 @@
   } from "./lib/keyMappings.js";
   import { fmtKey } from "./lib/chipUtils.js";
   import ChipEditor from "./lib/ChipEditor.svelte";
+  import Tour from "./lib/Tour.svelte";
   import logoSvg from "./lib/worldpad-logo.svg?raw";
+
+  let showTour = $state(false);
 
   // --- Persist state in localStorage ---
   function loadStoredState() {
@@ -216,10 +219,21 @@
   {@html logoSvg}
 </div>
 
+<!-- Tour trigger -->
+<button
+  class="fixed top-4 right-4 z-50 w-7 h-7 rounded-full border border-base-300 text-base-content/40 hover:text-primary hover:border-primary transition-colors text-sm font-mono"
+  onclick={() => showTour = true}
+  title="Show tutorial"
+>?</button>
+
+{#if showTour}
+  <Tour onClose={() => showTour = false} />
+{/if}
+
 <div class="min-h-screen bg-base-200 p-8 pb-16">
   <div class="max-w-2xl mx-auto space-y-4">
     <!-- Key Actions -->
-    <div class="card bg-base-100 border border-base-300">
+    <div id="tour-keyboard" class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
         <h2 class="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
           Key Actions
@@ -273,7 +287,7 @@
     </div>
 
     <!-- Encoder Actions -->
-    <div class="card bg-base-100 border border-base-300">
+    <div id="tour-encoders" class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
         <h2 class="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
           Encoder Actions
@@ -382,6 +396,7 @@
 
 <!-- Bottom status bar -->
 <div
+  id="tour-save"
   class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 px-8 py-2.5 flex items-center justify-end gap-3 text-sm font-mono z-50"
 >
   <input

@@ -55,3 +55,25 @@ body {
 [data-theme="worldpad"] .btn-outline {
   --border: 1px;
 }
+
+/* Tour UI highlight */
+.tour-highlight {
+  outline: 2px solid #e03030;
+  outline-offset: 4px;
+  border-radius: 0.375rem;
+  animation: tour-pulse 1.5s ease-in-out infinite;
+}
+@keyframes tour-pulse {
+  0%, 100% { outline-color: #e03030; }
+  50%       { outline-color: #ff6666; }
+}
+
+/* Tour SVG highlights */
+[data-tour-highlight="keyboard"] #device-keyboard-frame rect { stroke: #e03030 !important; stroke-width: 2; }
+[data-tour-highlight="encoder1"] #device-encoder1 path,
+[data-tour-highlight="encoder1"] #device-encoder1 circle { stroke: #e03030 !important; }
+[data-tour-highlight="encoder1"] #device-encoder1 .st5 { fill: #e03030 !important; }
+[data-tour-highlight="encoder2"] #device-encoder2 path { stroke: #e03030 !important; }
+[data-tour-highlight="encoder2"] #device-encoder2 .st6 { fill: #e03030 !important; }
+[data-tour-highlight="action"]   #device-action-key .st4 { fill: #e03030 !important; }
+[data-tour-highlight="display"]  #device-display polygon { stroke: #e03030 !important; fill: #1a0000 !important; }
