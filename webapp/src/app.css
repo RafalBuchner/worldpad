@@ -1,7 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+@font-face {
+  font-family: "SomeGrotesk";
+  src: url("https://goodcharacters.xyz/fonts/SomeGrotesk-Thin.woff2")
+    format("woff2");
+  font-weight: 100;
+}
+@font-face {
+  font-family: "SomeGrotesk";
+  src: url("https://goodcharacters.xyz/fonts/SomeGrotesk-ExtraLight.woff2")
+    format("woff2");
+  font-weight: 200;
+}
+@font-face {
+  font-family: "SomeGrotesk";
+  src: url("https://goodcharacters.xyz/fonts/SomeGrotesk-Regular.woff2")
+    format("woff2");
+  font-weight: 400;
+}
+@font-face {
+  font-family: "SomeGrotesk";
+  src: url("https://goodcharacters.xyz/fonts/SomeGrotesk-Semibold.woff2")
+    format("woff2");
+  font-weight: 600;
+}
+@font-face {
+  font-family: "SomeGrotesk";
+  src: url("https://goodcharacters.xyz/fonts/SomeGrotesk-Bold.woff2")
+    format("woff2");
+  font-weight: 700;
+}
+@font-face {
+  font-family: "SomeGrotesk";
+  src: url("https://goodcharacters.xyz/fonts/SomeGrotesk-Black.woff2")
+    format("woff2");
+  font-weight: 900;
+}
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: ["worldpad --default"];
+  themes: [ "worldpad --default"];
 }
 
 [data-theme="worldpad"] {
@@ -32,12 +69,12 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "SomeGrotesk", "Poppins", sans-serif;
   letter-spacing: -0.02em;
 }
 
 .font-mono {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: "IBM Plex Mono", monospace;
 }
 
 [data-theme="worldpad"] .btn:focus-visible,
@@ -64,16 +101,37 @@ body {
   animation: tour-pulse 1.5s ease-in-out infinite;
 }
 @keyframes tour-pulse {
-  0%, 100% { outline-color: #e03030; }
-  50%       { outline-color: #ff6666; }
+  0%,
+  100% {
+    outline-color: #e03030;
+  }
+  50% {
+    outline-color: #ff6666;
+  }
 }
 
 /* Tour SVG highlights */
-[data-tour-highlight="keyboard"] #device-keyboard-frame rect { stroke: #e03030 !important; stroke-width: 2; }
+[data-tour-highlight="keyboard"] #device-keyboard-frame rect {
+  stroke: #e03030 !important;
+  stroke-width: 2;
+}
 [data-tour-highlight="encoder1"] #device-encoder1 path,
-[data-tour-highlight="encoder1"] #device-encoder1 circle { stroke: #e03030 !important; }
-[data-tour-highlight="encoder1"] #device-encoder1 .st5 { fill: #e03030 !important; }
-[data-tour-highlight="encoder2"] #device-encoder2 path { stroke: #e03030 !important; }
-[data-tour-highlight="encoder2"] #device-encoder2 .st6 { fill: #e03030 !important; }
-[data-tour-highlight="action"]   #device-action-key .st4 { fill: #e03030 !important; }
-[data-tour-highlight="display"]  #device-display polygon { stroke: #e03030 !important; fill: #1a0000 !important; }
+[data-tour-highlight="encoder1"] #device-encoder1 circle {
+  stroke: #e03030 !important;
+}
+[data-tour-highlight="encoder1"] #device-encoder1 .st5 {
+  fill: #e03030 !important;
+}
+[data-tour-highlight="encoder2"] #device-encoder2 path {
+  stroke: #e03030 !important;
+}
+[data-tour-highlight="encoder2"] #device-encoder2 .st6 {
+  fill: #e03030 !important;
+}
+[data-tour-highlight="action"] #device-action-key .st4 {
+  fill: #e03030 !important;
+}
+[data-tour-highlight="display"] #device-display polygon {
+  stroke: #e03030 !important;
+  fill: #1a0000 !important;
+}

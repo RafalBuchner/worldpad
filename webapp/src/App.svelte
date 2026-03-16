@@ -9,8 +9,10 @@
   import ChipEditor from "./lib/ChipEditor.svelte";
   import Tour from "./lib/Tour.svelte";
   import logoSvg from "./lib/worldpad-logo.svg?raw";
+  import helpArrowSvg from "./lib/help-arrow.svg?raw";
 
   let showTour = $state(false);
+  let showHint = $state(!localStorage.getItem("worldpad-tour-seen"));
 
   // --- Persist state in localStorage ---
   function loadStoredState() {
@@ -44,11 +46,29 @@
   // --- Key button grid ---
   // Each entry is [keyIndex, colSpan]; span defaults to 1
   const KEY_LAYOUT = [
-     0,  1,  2,  3,  4,
-     5,  6,  7,  8,  9,
-    10, 11, 12, 13, 14,
-    [15, 2], 16, 17, 18,
-    19, 20, 21, [22, 2],
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    [15, 2],
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    [22, 2],
   ].map((v) => (Array.isArray(v) ? v : [v, 1]));
 
   // --- Key button inline capture ---
@@ -221,13 +241,32 @@
 
 <!-- Tour trigger -->
 <button
-  class="fixed top-4 right-4 z-50 w-7 h-7 rounded-full border border-base-300 text-base-content/40 hover:text-primary hover:border-primary transition-colors text-sm font-mono"
-  onclick={() => showTour = true}
-  title="Show tutorial"
->?</button>
+  class="fixed top-4 right-4 z-50 w-7 h-7 rounded-full border border-primary text-primary/60 hover:text-primary transition-colors text-sm font-mono"
+  onclick={() => {
+    showTour = true;
+    showHint = false;
+    localStorage.setItem("worldpad-tour-seen", "1");
+  }}
+  title="Show tutorial">?</button
+>
+
+<!-- Help arrow hint (shown until tour is first opened) -->
+{#if showHint}
+  <div
+    class="fixed z-40 pointer-events-none text-primary"
+    style="top: 23px; right: 42px; width: 440px;"
+  >
+    {@html helpArrowSvg}
+  </div>
+{/if}
 
 {#if showTour}
-  <Tour onClose={() => showTour = false} />
+  <Tour
+    onClose={() => {
+      showTour = false;
+      localStorage.setItem("worldpad-tour-seen", "1");
+    }}
+  />
 {/if}
 
 <div class="min-h-screen bg-base-200 p-8 pb-16">
@@ -235,7 +274,9 @@
     <!-- Key Actions -->
     <div id="tour-keyboard" class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
-        <h2 class="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
+        <h2
+          class="text-xs font-semibold uppercase tracking-widest text-primary mb-1"
+        >
           Key Actions
         </h2>
 
@@ -247,7 +288,10 @@
           ></button>
         {/if}
 
-        <div class="grid gap-1 w-full" style="grid-template-columns: repeat(5, 1fr);">
+        <div
+          class="grid gap-1 w-full"
+          style="grid-template-columns: repeat(5, 1fr);"
+        >
           {#each KEY_LAYOUT as [keyIdx, span]}
             {@const isEditing = editingKeyIndex === keyIdx}
             <button
@@ -261,7 +305,9 @@
               onclick={() => startEditing(keyIdx)}
             >
               {#if isEditing}
-                {@html pickedKeys.length > 0 ? pickedKeys.map(fmtKey).join("+") : "…"}
+                {@html pickedKeys.length > 0
+                  ? pickedKeys.map(fmtKey).join("+")
+                  : "…"}
               {:else}
                 {@html hotkeys[keyIdx].map(fmtKey).join("+")}
               {/if}
@@ -289,7 +335,9 @@
     <!-- Encoder Actions -->
     <div id="tour-encoders" class="card bg-base-100 border border-base-300">
       <div class="card-body gap-3">
-        <h2 class="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
+        <h2
+          class="text-xs font-semibold uppercase tracking-widest text-primary mb-1"
+        >
           Encoder Actions
         </h2>
 
@@ -301,7 +349,12 @@
           ></button>
         {/if}
 
-        <div class="overflow-x-auto outline-none" role="grid" tabindex="0" onkeydown={tableKeyDown}>
+        <div
+          class="overflow-x-auto outline-none"
+          role="grid"
+          tabindex="0"
+          onkeydown={tableKeyDown}
+        >
           <table class="table table-zebra table-sm w-full">
             <thead>
               <tr class="text-primary">
@@ -317,7 +370,9 @@
                   class="cursor-pointer"
                   class:bg-primary={rowIdx === selectedEncoderRow}
                   class:text-primary-content={rowIdx === selectedEncoderRow}
-                  onclick={() => { selectedEncoderRow = rowIdx; }}
+                  onclick={() => {
+                    selectedEncoderRow = rowIdx;
+                  }}
                 >
                   <td
                     class="cursor-text"
@@ -354,10 +409,12 @@
                       class:ring-primary={isActive}
                       class:rounded={isActive}
                       title="Double-click to edit hotkey"
-                      ondblclick={() => startEditingEncoderHotkey(rowIdx, colIdx)}
+                      ondblclick={() =>
+                        startEditingEncoderHotkey(rowIdx, colIdx)}
                       onclick={(e) => e.stopPropagation()}
                     >
-                      {@html encoder.hotkeys[colIdx]?.map(fmtKey).join("+") ?? ""}
+                      {@html encoder.hotkeys[colIdx]?.map(fmtKey).join("+") ??
+                        ""}
                     </td>
                   {/each}
                 </tr>
@@ -385,7 +442,9 @@
               disabled={selectedEncoderRow < 0}
               onclick={addHotkey}
             >
-              add hotkey{selectedEncoderName ? ` to "${selectedEncoderName}"` : ""}
+              add hotkey{selectedEncoderName
+                ? ` to "${selectedEncoderName}"`
+                : ""}
             </button>
           </div>
         {/if}

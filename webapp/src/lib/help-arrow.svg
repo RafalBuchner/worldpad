@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" viewBox="0 0 472.81 648.54" fill="currentColor">
+  <!-- Generator: Adobe Illustrator 30.2.1, SVG Export Plug-In . SVG Version: 2.1.1 Build 1)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: currentColor;
+        font-family: SomeGrotesk, sans-serif;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+      .st1 {
+        fill: none;
+        stroke: currentColor;
+        stroke-miterlimit: 10;
+      }
+
+      /* Letter reveal */
+      .char {
+        opacity: 0;
+        animation: char-appear 0.1s ease forwards;
+      }
+      @keyframes char-appear {
+        to { opacity: 1; }
+      }
+
+      /* Arrow line draw — starts from text side, ends at arrowhead */
+      .arrow-line {
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        animation: draw-line 1.5s ease forwards;
+        animation-delay: 2.0s;
+      }
+      @keyframes draw-line {
+        to { stroke-dashoffset: 0; }
+      }
+
+      /* Arrowhead fades in after line finishes */
+      .arrowhead {
+        opacity: 0;
+        animation: appear 0.3s ease forwards;
+        animation-delay: 3.5s;
+      }
+      @keyframes appear {
+        to { opacity: 1; }
+      }
+    </style>
+    <path id="path" d="M25.79,618.73c.96-55.19,98.35-73.28,96.71-159.07"/>
+  </defs>
+  <g>
+    <path class="st1 arrow-line" pathLength="1" d="M121.96,453.68c-1.64-9.34,60.44-21.75,53.21-34.51-6.95-12.25-64.6-36.06-64.3-46.52.35-12.49,60.51-10.22,62.36-22.77,1.21-8.18-59.07-29.62-51.27-30.59,108.79-13.62,79.09-131.99,149.1-99.41,140.8,65.54,11.3-174.24,198.61-211.87"/>
+    <path class="arrowhead" d="M464.03,14.17c-.19-.2-.19-.51,0-.71l5.43-5.39-7.18-2.65c-.26-.1-.39-.38-.3-.64.1-.26.39-.39.64-.3l7.91,2.92c.16.06.28.2.32.36.04.17-.02.34-.14.46l-5.99,5.94c-.07.07-.16.11-.25.13-.16.04-.34-.01-.46-.14Z"/>
+  </g>
+  <text>
+    <textPath xlink:href="#path">
+      <tspan class="st0 char" style="animation-delay: 0.00s" x="0">N</tspan>
+      <tspan class="st0 char" style="animation-delay: 0.15s">e</tspan>
+      <tspan class="st0 char" style="animation-delay: 0.30s">e</tspan>
+      <tspan class="st0 char" style="animation-delay: 0.45s">d </tspan>
+      <tspan class="st0 char" style="animation-delay: 0.60s" dx="5">S</tspan>
+      <tspan class="st0 char" style="animation-delay: 0.75s">o</tspan>
+      <tspan class="st0 char" style="animation-delay: 0.90s">m</tspan>
+      <tspan class="st0 char" style="animation-delay: 1.05s">e </tspan>
+      <tspan class="st0 char" style="animation-delay: 1.20s" dx="5">H</tspan>
+      <tspan class="st0 char" style="animation-delay: 1.35s">e</tspan>
+      <tspan class="st0 char" style="animation-delay: 1.50s">l</tspan>
+      <tspan class="st0 char" style="animation-delay: 1.65s">p</tspan>
+      <tspan class="st0 char" style="animation-delay: 1.80s">?</tspan>
+    </textPath>
+  </text>
+</svg>
