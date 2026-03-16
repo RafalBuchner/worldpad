@@ -159,6 +159,7 @@ dmypy.json
 webapp/node_modules/
 webapp/dist/
 webapp/.svelte-kit/
+!webapp/src/lib/
 
 # Temporary files
 *.000

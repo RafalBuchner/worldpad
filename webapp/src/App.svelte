@@ -305,7 +305,11 @@
                   class:text-primary-content={rowIdx === selectedEncoderRow}
                   onclick={() => { selectedEncoderRow = rowIdx; }}
                 >
-                  <td ondblclick={() => startEditingEncoderName(rowIdx)}>
+                  <td
+                    class="cursor-text"
+                    title="Double-click to edit name"
+                    ondblclick={() => startEditingEncoderName(rowIdx)}
+                  >
                     {#if editingEncoderName === rowIdx}
                       <input
                         type="text"
@@ -329,12 +333,13 @@
                       editingEncoderHotkey?.rowIdx === rowIdx &&
                       editingEncoderHotkey?.colIdx === colIdx}
                     <td
-                      class="font-mono text-xl tracking-widest"
+                      class="font-mono text-xl tracking-widest cursor-text"
                       class:relative={isActive}
                       class:z-20={isActive}
                       class:ring={isActive}
                       class:ring-primary={isActive}
                       class:rounded={isActive}
+                      title="Double-click to edit hotkey"
                       ondblclick={() => startEditingEncoderHotkey(rowIdx, colIdx)}
                       onclick={(e) => e.stopPropagation()}
                     >
