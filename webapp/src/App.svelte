@@ -186,7 +186,7 @@
   function startEditing(keyIdx) {
     cancelEncoderHotkey();
     editingKeyIndex = keyIdx;
-    pickedKeys = [];
+    pickedKeys = [...(hotkeys[keyIdx] ?? [])];
     showKeyPicker = false;
     setTimeout(() => captureInputEl?.focus(), 0);
   }
@@ -487,6 +487,10 @@
                     <span class="text-base-content/30 text-xs italic"
                       >press a key or pick from below…</span
                     >
+                  {:else}
+                    <span class="text-base-content/30 text-xs italic ml-1"
+                      >press a key to replace · click chip to remove</span
+                    >
                   {/if}
                 </div>
                 <div class="flex items-center gap-2">
@@ -544,7 +548,7 @@
             {/if}
           </div>
         {:else}
-          <p class="text-xs text-base-content/50">
+          <p class="text-xs text-base-content/50 mt-1">
             Click a key then press your desired combination.
           </p>
         {/if}
@@ -678,6 +682,10 @@
                   {#if encoderPickedKeys.length === 0}
                     <span class="text-base-content/30 text-xs italic"
                       >press a key or pick from below…</span
+                    >
+                  {:else}
+                    <span class="text-base-content/30 text-xs italic ml-1"
+                      >press a key to replace · click chip to remove</span
                     >
                   {/if}
                 </div>
