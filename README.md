@@ -156,4 +156,5 @@ This repository uses uv package manager. Install nescessary dependencies using `
 
 ## to restart tour behaviour:
 
-Place `localStorage.removeItem("worldpad-tour-seen")` in browser's console.
+To restart tour behaviour: Place `localStorage.removeItem("worldpad-tour-seen")` in the browser's console.
+To restart states: Place `localStorage.removeItem("worldpad-state")` in the browser's console.
