@@ -91,21 +91,22 @@
   const tooltipStyle = $derived.by(() => {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
+    const w = Math.min(TOOLTIP_W, vw - 32);
 
     if (!spotlightRect) {
-      const left = Math.round(vw / 2 - TOOLTIP_W / 2);
+      const left = Math.round(vw / 2 - w / 2);
       const top = Math.round(vh / 2 - TOOLTIP_H / 2);
-      return `top: ${top}px; left: ${left}px; width: ${TOOLTIP_W}px;`;
+      return `top: ${top}px; left: ${left}px; width: ${w}px;`;
     }
 
     const cx = spotlightRect.left + spotlightRect.width / 2;
-    const left = Math.max(16, Math.min(Math.round(cx - TOOLTIP_W / 2), vw - TOOLTIP_W - 16));
+    const left = Math.max(16, Math.min(Math.round(cx - w / 2), vw - w - 16));
     const spBottom = spotlightRect.top + spotlightRect.height;
 
     if (spBottom + GAP + TOOLTIP_H <= vh - 8) {
-      return `top: ${Math.round(spBottom + GAP)}px; left: ${left}px; width: ${TOOLTIP_W}px;`;
+      return `top: ${Math.round(spBottom + GAP)}px; left: ${left}px; width: ${w}px;`;
     }
-    return `top: ${Math.max(16, Math.round(spotlightRect.top - GAP - TOOLTIP_H))}px; left: ${left}px; width: ${TOOLTIP_W}px;`;
+    return `top: ${Math.max(16, Math.round(spotlightRect.top - GAP - TOOLTIP_H))}px; left: ${left}px; width: ${w}px;`;
   });
 
   function prev() { if (current > 0) current--; }

@@ -232,6 +232,19 @@
   }
 </script>
 
+<!-- Mobile message -->
+<div class="sm:hidden fixed inset-0 z-[999] bg-base-200 flex flex-col items-center justify-center gap-6 p-8 text-center">
+  <div class="w-48 text-primary [&>svg]:w-full [&>svg]:h-auto">
+    {@html logoSvg}
+  </div>
+  <p class="text-base-content/60 text-sm leading-relaxed">
+    WorldPad is designed to be used on a computer.<br/>Please open it on a desktop or laptop.
+  </p>
+</div>
+
+<!-- Desktop app (hidden on mobile) -->
+<div class="hidden sm:contents">
+
 <!-- Fixed top-left logo -->
 <div
   class="fixed left-0 top-0 w-72 p-6 text-primary [&>svg]:w-full [&>svg]:h-auto pointer-events-none"
@@ -482,3 +495,5 @@
     onclick={() => fileInput.click()}>load</button
   >
 </div>
+
+</div><!-- end desktop wrapper -->
