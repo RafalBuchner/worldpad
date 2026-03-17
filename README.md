@@ -153,3 +153,7 @@ This repository uses uv package manager. Install nescessary dependencies using `
 ![WorldPad2_300x300](/Photos/WorldPad2_300x300.jpg)
 
 ![WorldPad3_300x300](/Photos/WorldPad3_300x300.jpg)
+
+## to restart tour behaviour:
+
+Place `localStorage.removeItem("worldpad-tour-seen")` in browser's console.
