@@ -111,27 +111,26 @@ body {
 }
 
 /* Tour SVG highlights */
-[data-tour-highlight="keyboard"] #device-keyboard-frame rect {
+[data-tour-highlight~="keyboard"] #device-keyboard-frame rect {
   stroke: #e03030 !important;
   stroke-width: 2;
 }
-[data-tour-highlight="encoder1"] #device-encoder1 path,
-[data-tour-highlight="encoder1"] #device-encoder1 circle {
+[data-tour-highlight~="encoder1"] #device-encoder1 path {
   stroke: #e03030 !important;
 }
-[data-tour-highlight="encoder1"] #device-encoder1 .st5 {
+[data-tour-highlight~="encoder1"] #device-encoder1 .st5 {
   fill: #e03030 !important;
 }
-[data-tour-highlight="encoder2"] #device-encoder2 path {
+[data-tour-highlight~="encoder2"] #device-encoder2 path {
   stroke: #e03030 !important;
 }
-[data-tour-highlight="encoder2"] #device-encoder2 .st6 {
+[data-tour-highlight~="encoder2"] #device-encoder2 .st6 {
   fill: #e03030 !important;
 }
-[data-tour-highlight="action"] #device-action-key .st4 {
+[data-tour-highlight~="action"] #device-action-key .st4 {
   fill: #e03030 !important;
 }
-[data-tour-highlight="display"] #device-display polygon {
+[data-tour-highlight~="display"] #device-display polygon {
   stroke: #e03030 !important;
   fill: #1a0000 !important;
 }

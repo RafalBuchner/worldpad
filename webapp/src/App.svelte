@@ -195,6 +195,9 @@
   // --- Load / Save ---
   let fileInput = $state(null);
   let saveFileName = $state("preset");
+  let fileMenuOpen = $state(false);
+  let showSaveDialog = $state(false);
+  let saveDialogInput = $state(null);
 
   function onFileChange(event) {
     const file = event.target.files[0];
@@ -219,9 +222,37 @@
     event.target.value = "";
   }
 
-  function saveToFile() {
+  function handleGlobalKeydown(e) {
+    if (e.key === "Escape" && showSaveDialog) { showSaveDialog = false; return; }
+    if (!(e.metaKey || e.ctrlKey)) return;
+    if (e.key === "s") { e.preventDefault(); openSaveDialog(); }
+    if (e.key === "o") { e.preventDefault(); fileInput?.click(); }
+  }
+
+  function openSaveDialog() {
+    fileMenuOpen = false;
+    showSaveDialog = true;
+    setTimeout(() => { saveDialogInput?.select(); }, 0);
+  }
+
+  async function confirmSave() {
+    showSaveDialog = false;
     const config = convertSymbolicConfigToAdafruit(hotkeys, encoders);
     const json = JSON.stringify(config, null, 1);
+    if ("showSaveFilePicker" in window) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: (saveFileName.trim() || "preset") + ".json",
+          types: [{ description: "JSON", accept: { "application/json": [".json"] } }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(json);
+        await writable.close();
+        return;
+      } catch (e) {
+        if (e.name === "AbortError") return;
+      }
+    }
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -231,6 +262,8 @@
     URL.revokeObjectURL(url);
   }
 </script>
+
+<svelte:window onkeydown={handleGlobalKeydown} />
 
 <!-- Mobile message -->
 <div class="sm:hidden fixed inset-0 z-[999] bg-base-200 flex flex-col items-center justify-center gap-6 p-8 text-center">
@@ -246,27 +279,51 @@
 <div class="hidden sm:contents">
 
 <!-- Fixed top-left logo -->
-<div
-  class="fixed left-0 top-0 w-72 p-6 text-primary [&>svg]:w-full [&>svg]:h-auto pointer-events-none"
->
+<div class="fixed left-0 top-0 w-72 p-6 text-primary [&>svg]:w-full [&>svg]:h-auto pointer-events-none z-40">
   {@html logoSvg}
 </div>
 
 <!-- Tour trigger -->
 <button
   class="fixed top-4 right-4 z-50 w-7 h-7 rounded-full border border-primary text-primary/60 hover:text-primary transition-colors text-sm font-mono"
-  onclick={() => {
-    showTour = true;
-    showHint = false;
-    localStorage.setItem("worldpad-tour-seen", "1");
-  }}
-  title="Show tutorial">?</button
->
+  onclick={() => { showTour = true; showHint = false; localStorage.setItem("worldpad-tour-seen", "1"); }}
+  title="Show tutorial">?</button>
+
+<!-- Menu bar -->
+<div class="fixed top-0 left-0 right-0 z-50 px-8 pointer-events-none">
+  <div
+    id="tour-save"
+    class="max-w-2xl mx-auto h-9 bg-base-100/90 backdrop-blur-sm border-x border-b border-base-300 rounded-b flex items-center px-3 gap-1 pointer-events-auto"
+  >
+    <!-- File menu -->
+    <div class="relative">
+      <button
+        class="px-2 py-0.5 text-sm rounded hover:bg-base-200 transition-colors font-mono"
+        onclick={() => (fileMenuOpen = !fileMenuOpen)}
+      >File</button>
+      {#if fileMenuOpen}
+        <button class="fixed inset-0 z-[-1] cursor-default" onclick={() => (fileMenuOpen = false)} aria-label="Close menu"></button>
+        <div class="absolute top-full left-0 mt-1 bg-base-100 border border-base-300 rounded shadow-lg py-1 min-w-36 z-10">
+          <button
+            class="w-full text-left px-4 py-1.5 text-sm hover:bg-base-200 transition-colors font-mono flex justify-between items-center gap-6"
+            onclick={openSaveDialog}
+          >Save <span class="text-base-content/30 text-xs">⌘S</span></button>
+          <button
+            class="w-full text-left px-4 py-1.5 text-sm hover:bg-base-200 transition-colors font-mono flex justify-between items-center gap-6"
+            onclick={() => { fileMenuOpen = false; fileInput.click(); }}
+          >Open <span class="text-base-content/30 text-xs">⌘O</span></button>
+        </div>
+      {/if}
+    </div>
+  </div>
+</div>
+
+<input bind:this={fileInput} type="file" accept=".json" class="hidden" onchange={onFileChange} />
 
 <!-- Help arrow hint (shown until tour is first opened) -->
 {#if showHint}
   <div
-    class="fixed z-40 pointer-events-none text-primary"
+    class="fixed z-[51] pointer-events-none text-primary"
     style="top: 23px; right: 42px; width: 440px;"
   >
     {@html helpArrowSvg}
@@ -282,7 +339,7 @@
   />
 {/if}
 
-<div class="min-h-screen bg-base-200 p-8 pb-16">
+<div class="min-h-screen bg-base-200 pt-14 p-8">
   <div class="max-w-2xl mx-auto space-y-4">
     <!-- Key Actions -->
     <div id="tour-keyboard" class="card bg-base-100 border border-base-300">
@@ -466,34 +523,32 @@
   </div>
 </div>
 
-<!-- Bottom status bar -->
-<div
-  id="tour-save"
-  class="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 px-8 py-2.5 flex items-center justify-end gap-3 text-sm font-mono z-50"
->
-  <input
-    bind:this={fileInput}
-    type="file"
-    accept=".json"
-    class="hidden"
-    onchange={onFileChange}
-  />
-  <input
-    type="text"
-    class="bg-transparent text-base-content/50 focus:text-base-content focus:outline-none w-32 transition-colors"
-    bind:value={saveFileName}
-    placeholder="preset"
-  /><span class="text-base-content/30">.json</span>
-  <span class="text-base-content/20 select-none">·</span>
-  <button
-    class="text-base-content/40 hover:text-primary transition-colors"
-    onclick={saveToFile}>save</button
-  >
-  <span class="text-base-content/20 select-none">·</span>
-  <button
-    class="text-base-content/40 hover:text-base-content transition-colors"
-    onclick={() => fileInput.click()}>load</button
-  >
-</div>
+
+{#if showSaveDialog}
+  <button class="fixed inset-0 z-[60] bg-black/40" onclick={() => (showSaveDialog = false)} aria-label="Cancel"></button>
+  <div class="fixed inset-0 z-[61] flex items-center justify-center pointer-events-none">
+    <div
+      class="bg-base-100 border border-base-300 rounded-xl shadow-2xl p-6 w-80 pointer-events-auto"
+      role="dialog"
+    >
+      <p class="text-xs font-semibold uppercase tracking-widest text-primary mb-4">Save preset</p>
+      <div class="flex items-center gap-1 mb-4">
+        <input
+          bind:this={saveDialogInput}
+          type="text"
+          class="input input-bordered input-sm flex-1 font-mono"
+          bind:value={saveFileName}
+          placeholder="preset"
+          onkeydown={(e) => { if (e.key === "Enter") confirmSave(); else if (e.key === "Escape") showSaveDialog = false; }}
+        />
+        <span class="text-base-content/40 text-sm font-mono">.json</span>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button class="btn btn-sm btn-ghost" onclick={() => (showSaveDialog = false)}>cancel</button>
+        <button class="btn btn-sm btn-primary" onclick={confirmSave}>save</button>
+      </div>
+    </div>
+  </div>
+{/if}
 
 </div><!-- end desktop wrapper -->

@@ -21,26 +21,26 @@
     },
     {
       title: "Assigning a Key Shortcut",
-      text: "Click any key to start editing it. Then type a key combination on your keyboard — each key becomes a chip. You can also pick special keys (F-keys, media keys, numpad…) from the panel below.",
+      text: "Click any key to start editing it. Then type a key combination on your keyboard — each key becomes listed on the list below the layout. You can also pick special keys (F-keys, media keys, numpad…) from the panel below.",
       svgHighlight: "keyboard",
       uiTarget: "tour-keyboard",
     },
     {
       title: "Encoders (Rotary Knobs)",
       text: "Your device has two rotary encoders. Each row in this table is a named encoder action. Push the knob to cycle through available actions — the name appears on the device display.",
-      svgHighlight: "encoder1",
+      svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
     {
       title: "Left / Right Mode",
       text: "Assign exactly 2 hotkeys to an encoder to create a Left/Right action. The first hotkey fires on counterclockwise rotation, the second on clockwise.",
-      svgHighlight: "encoder2",
+      svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
     {
       title: "Carousel Mode",
       text: "Assign 1 or 3+ hotkeys for Carousel mode. Each clockwise step advances to the next hotkey in the list; counterclockwise steps back. Great for cycling through numbered shortcuts.",
-      svgHighlight: "encoder1",
+      svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
     {
@@ -64,9 +64,15 @@
 
   $effect(() => {
     const id = STEPS[current].uiTarget;
-    if (!id) { spotlightRect = null; return; }
+    if (!id) {
+      spotlightRect = null;
+      return;
+    }
     const el = document.getElementById(id);
-    if (!el) { spotlightRect = null; return; }
+    if (!el) {
+      spotlightRect = null;
+      return;
+    }
 
     function measure() {
       const r = el.getBoundingClientRect();
@@ -81,7 +87,10 @@
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     measure();
     setTimeout(measure, 380);
-    window.addEventListener("scroll", measure, { passive: true, capture: true });
+    window.addEventListener("scroll", measure, {
+      passive: true,
+      capture: true,
+    });
     return () => {
       window.removeEventListener("scroll", measure, { capture: true });
       spotlightRect = null;
@@ -109,8 +118,13 @@
     return `top: ${Math.max(16, Math.round(spotlightRect.top - GAP - TOOLTIP_H))}px; left: ${left}px; width: ${w}px;`;
   });
 
-  function prev() { if (current > 0) current--; }
-  function next() { if (!isLast) current++; else onClose(); }
+  function prev() {
+    if (current > 0) current--;
+  }
+  function next() {
+    if (!isLast) current++;
+    else onClose();
+  }
 </script>
 
 <!-- Full-screen click blocker (dismiss on outside click) -->
@@ -148,12 +162,16 @@
 >
   {#key current}
     <div class="flex gap-4 items-start" in:fade={{ duration: 180, delay: 80 }}>
-
       <!-- Text + nav -->
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 mb-1.5">
-          <span class="text-xs font-mono text-base-content/40">{current + 1} / {STEPS.length}</span>
-          <span class="text-xs text-primary font-semibold uppercase tracking-widest">{step.title}</span>
+          <span class="text-xs font-mono text-base-content/40"
+            >{current + 1} / {STEPS.length}</span
+          >
+          <span
+            class="text-xs text-primary font-semibold uppercase tracking-widest"
+            >{step.title}</span
+          >
         </div>
         <p class="text-sm text-base-content/80 leading-relaxed">{step.text}</p>
 
@@ -162,9 +180,11 @@
           <div class="flex gap-1.5 flex-1">
             {#each STEPS as _, i}
               <button
-                class="w-1.5 h-1.5 rounded-full transition-colors {i === current ? 'bg-primary' : 'bg-base-content/20'}"
+                class="w-1.5 h-1.5 rounded-full transition-colors {i === current
+                  ? 'bg-primary'
+                  : 'bg-base-content/20'}"
                 aria-label="Go to step {i + 1}"
-                onclick={() => current = i}
+                onclick={() => (current = i)}
               ></button>
             {/each}
           </div>
@@ -180,18 +200,22 @@
 
       <!-- Logo (welcome step) -->
       {#if step.showLogo}
-        <div class="w-[200px] shrink-0 text-primary [&>svg]:w-full [&>svg]:h-auto">
+        <div
+          class="w-[200px] shrink-0 text-primary [&>svg]:w-full [&>svg]:h-auto"
+        >
           {@html logoSvg}
         </div>
       {/if}
 
       <!-- Device SVG (when relevant) -->
       {#if step.svgHighlight}
-        <div class="w-56 shrink-0 opacity-90" data-tour-highlight={step.svgHighlight}>
+        <div
+          class="w-56 shrink-0 opacity-90"
+          data-tour-highlight={[step.svgHighlight].flat().join(" ")}
+        >
           {@html deviceSvg}
         </div>
       {/if}
-
     </div>
   {/key}
 </div>
