@@ -36,19 +36,19 @@
     },
     {
       title: "Encoders (Rotary Knobs)",
-      text: "Your device has two rotary encoders. Each row in this table is a named encoder action. Push the knob to cycle through available actions: the name appears on the device display.",
+      text: "Your device has two knobs. Each row in this table is a named action that any of those knobs can perform.\nPush the knob to cycle through available actions: the name appears on the device display.",
       svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
     {
       title: "Left / Right Mode",
-      text: "Assign exactly 2 hotkeys to an encoder to create a Left/Right action. The first hotkey fires on counterclockwise rotation, the second on clockwise.",
+      text: "Assign exactly 2 hotkeys to create a Left/Right action. The first hotkey fires on counterclockwise rotation, the second on clockwise.",
       svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
     {
       title: "Carousel Mode",
-      text: "Assign 3 or more hotkeys for Carousel mode. Each clockwise step advances to the next hotkey in the list; counterclockwise steps back. Great for cycling through multiple tool shortcuts.",
+      text: "Assign 3 or more hotkeys to create a Carousel action. Each clockwise step advances to the next hotkey in the list; counterclockwise steps back. Great for cycling through multiple tool shortcuts.",
       svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
@@ -228,7 +228,11 @@
             >{step.title}</span
           >
         </div>
-        <p class="text-sm text-base-content/80 leading-relaxed">{step.text}</p>
+        <p
+          class="text-sm text-base-content/80 leading-relaxed whitespace-pre-line"
+        >
+          {step.text}
+        </p>
 
         <div class="flex items-center gap-2 mt-auto pt-4">
           <!-- Step dots -->
