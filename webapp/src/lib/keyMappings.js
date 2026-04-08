@@ -193,5 +193,15 @@ export const DEFAULT_ENCODERS = [
       convertAdafruitToSymbolicNames(['COMMAND', 'Z']),
       convertAdafruitToSymbolicNames(['SHIFT', 'COMMAND', 'Z'])
     ]
+  },
+  {
+    name: 'Numbers',
+    hotkeys: [
+      convertAdafruitToSymbolicNames(['ONE']),
+      convertAdafruitToSymbolicNames(['TWO']),
+      convertAdafruitToSymbolicNames(['THREE']),
+      convertAdafruitToSymbolicNames(['FOUR']),
+      convertAdafruitToSymbolicNames(['FIVE']),
+    ]
   }
 ];
