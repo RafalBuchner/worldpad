@@ -8,7 +8,7 @@
   const STEPS = [
     {
       title: "Welcome to WorldPad",
-      text: "A profile defines what each key and encoder does. You'll save it as a JSON file and copy it into the configs/ folder on the WorldPad USB device — the filename becomes the preset title on the display.",
+      text: "A profile defines what each key and encoder does. You'll save it as a JSON file and copy it into the configs/ folder on the WorldPad USB device: the filename becomes the preset title on the display.",
       svgHighlight: null,
       uiTarget: null,
       showLogo: true,
@@ -21,13 +21,13 @@
     },
     {
       title: "Assigning a Key Shortcut",
-      text: "Click any key to start editing it. Then type a key combination on your keyboard — each key becomes listed on the list below the layout. You can also pick special keys (F-keys, media keys, numpad…) from the panel below.",
+      text: "Click any key to start editing it. Then type a key combination on your keyboard: Each key becomes listed on the list below the layout. You can also pick special keys (F-keys, media keys, numpad…) from the panel below.",
       svgHighlight: "keyboard",
       uiTarget: "tour-keyboard",
     },
     {
       title: "Encoders (Rotary Knobs)",
-      text: "Your device has two rotary encoders. Each row in this table is a named encoder action. Push the knob to cycle through available actions — the name appears on the device display.",
+      text: "Your device has two rotary encoders. Each row in this table is a named encoder action. Push the knob to cycle through available actions: the name appears on the device display.",
       svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
@@ -45,7 +45,7 @@
     },
     {
       title: "Save Your Profile",
-      text: "Press Save to download the JSON file. Copy it into the configs/ folder on the WorldPad USB device. Done — your profile is live.",
+      text: "Press Save to download the JSON file. Copy it into the configs/ folder on the WorldPad USB device. Done: your profile is live.",
       svgHighlight: null,
       uiTarget: "tour-save",
     },
