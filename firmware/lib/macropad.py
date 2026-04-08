@@ -102,9 +102,9 @@ class Encoder:
 		position = self.encoder.position
 			
 		if position > self.last_position:
-			if self.upCallback is not None: self.upCallback()
-		if position < self.last_position:
 			if self.downCallback is not None: self.downCallback()
+		if position < self.last_position:
+			if self.upCallback is not None: self.upCallback()
 		self.last_position = position
 
 
