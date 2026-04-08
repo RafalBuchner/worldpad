@@ -54,7 +54,7 @@
     },
     {
       title: "Save Your Profile",
-      text: "Press Save to download the JSON file. Copy it into the configs/ folder on the WorldPad USB device. Done: your profile is live.",
+      text: "Press Save to download the JSON file.\nCopy it into the /configs/ folder on\nthe WorldPad USB device.\n\nDone: your profile is live.",
       svgHighlight: null,
       uiTarget: "tour-save",
       showDemo: "save-profile",
