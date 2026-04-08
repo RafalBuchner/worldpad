@@ -2,8 +2,9 @@
   import { fade } from "svelte/transition";
   import deviceSvg from "./device-top-view.svg?raw";
   import logoSvg from "./worldpad-logo.svg?raw";
+  import { SPECIAL_KEY_GROUPS, fmtKey } from "./chipUtils.js";
 
-  let { onClose } = $props();
+  let { onClose, onStepChange = () => {} } = $props();
 
   const STEPS = [
     {
@@ -21,9 +22,17 @@
     },
     {
       title: "Assigning a Key Shortcut",
-      text: "Click any key to start editing it. Then type a key combination on your keyboard: Each key becomes listed on the list below the layout. You can also pick special keys (F-keys, media keys, numpad…) from the panel below.",
-      svgHighlight: "keyboard",
+      text: "Click any key to start editing it. Then type a key combination on your keyboard: each key becomes listed below the layout.",
+      svgHighlight: null,
       uiTarget: "tour-keyboard",
+      showDemo: "key-chip",
+    },
+    {
+      title: "Special Keys",
+      text: 'You can also pick special keys (F-keys, media keys, numpad…) from the panel. To open this panel klick on "keys" button.',
+      svgHighlight: null,
+      uiTarget: "tour-keyboard",
+      showDemo: "special-keys",
     },
     {
       title: "Encoders (Rotary Knobs)",
@@ -39,7 +48,7 @@
     },
     {
       title: "Carousel Mode",
-      text: "Assign 1 or 3+ hotkeys for Carousel mode. Each clockwise step advances to the next hotkey in the list; counterclockwise steps back. Great for cycling through numbered shortcuts.",
+      text: "Assign 3 or more hotkeys for Carousel mode. Each clockwise step advances to the next hotkey in the list; counterclockwise steps back. Great for cycling through multiple tool shortcuts.",
       svgHighlight: ["encoder1", "encoder2"],
       uiTarget: "tour-encoders",
     },
@@ -48,6 +57,13 @@
       text: "Press Save to download the JSON file. Copy it into the configs/ folder on the WorldPad USB device. Done: your profile is live.",
       svgHighlight: null,
       uiTarget: "tour-save",
+      showDemo: "save-profile",
+    },
+    {
+      title: "Selecting a Profile",
+      text: "On the device, hold the button below the display and rotate the left knob to cycle through saved profiles. Release to confirm.",
+      svgHighlight: ["encoder1", "action"],
+      uiTarget: null,
     },
   ];
 
@@ -61,6 +77,38 @@
   const isLast = $derived(current === STEPS.length - 1);
 
   let spotlightRect = $state(null);
+
+  let demoChips = $state([]);
+  let _demoTimer = null;
+
+  $effect(() => {
+    if (step.showDemo !== "key-chip") {
+      clearTimeout(_demoTimer);
+      demoChips = [];
+      return;
+    }
+    const SEQ = ["⌘", "⇧", "A"];
+
+    function run() {
+      demoChips = [];
+      let i = 0;
+      function tick() {
+        if (i < SEQ.length) {
+          demoChips = SEQ.slice(0, ++i);
+          _demoTimer = setTimeout(tick, 480);
+        } else {
+          _demoTimer = setTimeout(run, 1000);
+        }
+      }
+      _demoTimer = setTimeout(tick, 400);
+    }
+
+    run();
+    return () => {
+      clearTimeout(_demoTimer);
+      demoChips = [];
+    };
+  });
 
   $effect(() => {
     const id = STEPS[current].uiTarget;
@@ -118,6 +166,10 @@
     return `top: ${Math.max(16, Math.round(spotlightRect.top - GAP - TOOLTIP_H))}px; left: ${left}px; width: ${w}px;`;
   });
 
+  $effect(() => {
+    onStepChange(step.showDemo ?? null);
+  });
+
   function prev() {
     if (current > 0) current--;
   }
@@ -161,9 +213,12 @@
   onkeydown={(e) => e.stopPropagation()}
 >
   {#key current}
-    <div class="flex gap-4 items-start" in:fade={{ duration: 180, delay: 80 }}>
+    <div
+      class="flex gap-4 items-stretch"
+      in:fade={{ duration: 180, delay: 80 }}
+    >
       <!-- Text + nav -->
-      <div class="flex-1 min-w-0">
+      <div class="flex-1 min-w-0 flex flex-col">
         <div class="flex items-center gap-2 mb-1.5">
           <span class="text-xs font-mono text-base-content/40"
             >{current + 1} / {STEPS.length}</span
@@ -175,7 +230,7 @@
         </div>
         <p class="text-sm text-base-content/80 leading-relaxed">{step.text}</p>
 
-        <div class="flex items-center gap-2 mt-4">
+        <div class="flex items-center gap-2 mt-auto pt-4">
           <!-- Step dots -->
           <div class="flex gap-1.5 flex-1">
             {#each STEPS as _, i}
@@ -214,6 +269,70 @@
           data-tour-highlight={[step.svgHighlight].flat().join(" ")}
         >
           {@html deviceSvg}
+        </div>
+      {:else if step.showDemo === "key-chip"}
+        <div class="w-48 shrink-0 flex flex-col gap-2">
+          <div
+            class="grid gap-1"
+            style="grid-template-columns: repeat(3, 1fr);"
+          >
+            {#each [0, 1, 2, 3, 4, 5, 6, 7, 8] as i}
+              <div
+                class="aspect-square rounded font-mono flex items-center justify-center border text-center leading-tight p-0.5
+                  {i === 4
+                  ? 'bg-primary text-primary-content border-primary animate-pulse text-xs'
+                  : 'bg-base-200 border-base-300 text-base-content/30 text-lg'}"
+              >
+                {#if i === 4}{@html demoChips.map(fmtKey).join("+") || "…"}{/if}
+              </div>
+            {/each}
+          </div>
+          <div
+            class="flex flex-wrap items-center gap-1.5 min-h-9 px-2 py-1.5 bg-base-200 rounded-box border border-base-300"
+          >
+            {#each demoChips as key, i}
+              {#if i > 0}<span class="text-base-content/30 text-xs font-mono"
+                  >+</span
+                >{/if}
+              <span
+                class="badge badge-neutral font-mono text-lg h-auto py-0.5 px-2"
+                >{key}</span
+              >
+            {/each}
+            {#if demoChips.length === 0}
+              <span class="text-base-content/30 text-xs italic"
+                >press a key…</span
+              >
+            {/if}
+          </div>
+        </div>
+      {:else if step.showDemo === "special-keys"}
+        <div class="w-48 shrink-0 flex flex-col gap-1.5">
+          <div
+            class="bg-base-200 rounded-box border border-base-300 p-2 space-y-2 overflow-hidden"
+          >
+            {#each SPECIAL_KEY_GROUPS.filter( (g) => ["F-keys", "Media"].includes(g.label), ) as group}
+              <div>
+                <p
+                  class="text-[10px] text-base-content/40 uppercase tracking-wide mb-1"
+                >
+                  {group.label}
+                </p>
+                <div class="flex flex-wrap gap-1">
+                  {#each group.keys as key}
+                    <span
+                      class="py-0.5 px-1 font-mono text-base rounded bg-base-100 border border-base-300 text-sm leading-none"
+                    >
+                      {@html fmtKey(key.sym)}
+                    </span>
+                  {/each}
+                </div>
+              </div>
+            {/each}
+            <p class="text-[10px] text-base-content/40 italic">
+              + modifiers, navigation, numpad…
+            </p>
+          </div>
         </div>
       {/if}
     </div>

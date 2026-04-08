@@ -8,6 +8,7 @@
     onConfirm,
     onCancel,
     confirmDisabled = false,
+    tourHighlightKeysBtn = false,
   } = $props();
 
   let showPicker = $state(false);
@@ -82,7 +83,8 @@
       </div>
       <div class="flex items-center gap-2">
         <button
-          class="btn btn-xs btn-ghost"
+          id="tour-keys-btn"
+          class="btn btn-xs btn-ghost {tourHighlightKeysBtn ? 'tour-highlight' : ''}"
           onclick={() => { showPicker = !showPicker; captureInputEl?.focus(); }}
         >
           keys {showPicker ? "▴" : "▾"}

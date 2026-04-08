@@ -13,6 +13,29 @@
 
   let showTour = $state(false);
   let showHint = $state(!localStorage.getItem("worldpad-tour-seen"));
+  let tourDemoStep = $state(null);
+  let _tourDemoEditing = false;
+
+  function handleTourStepChange(showDemo) {
+    tourDemoStep = showDemo;
+    if (showDemo === "key-chip" || showDemo === "special-keys") {
+      startEditing(0);
+      _tourDemoEditing = true;
+    } else if (_tourDemoEditing) {
+      cancelEditing();
+      _tourDemoEditing = false;
+    }
+  }
+
+  function handleTourClose() {
+    showTour = false;
+    localStorage.setItem("worldpad-tour-seen", "1");
+    if (_tourDemoEditing) {
+      cancelEditing();
+      _tourDemoEditing = false;
+    }
+    tourDemoStep = null;
+  }
 
   // --- Persist state in localStorage ---
   function loadStoredState() {
@@ -298,7 +321,7 @@
     <!-- File menu -->
     <div class="relative">
       <button
-        class="px-2 py-0.5 text-sm rounded hover:bg-base-200 transition-colors font-mono"
+        class="px-2 py-0.5 text-sm rounded hover:bg-base-200 transition-colors font-mono {tourDemoStep === 'save-profile' ? 'tour-highlight' : ''}"
         onclick={() => (fileMenuOpen = !fileMenuOpen)}
       >File</button>
       {#if fileMenuOpen}
@@ -331,12 +354,7 @@
 {/if}
 
 {#if showTour}
-  <Tour
-    onClose={() => {
-      showTour = false;
-      localStorage.setItem("worldpad-tour-seen", "1");
-    }}
-  />
+  <Tour onClose={handleTourClose} onStepChange={handleTourStepChange} />
 {/if}
 
 <div class="min-h-screen bg-base-200 pt-14 p-8">
@@ -392,6 +410,7 @@
               onConfirm={confirmEditing}
               onCancel={cancelEditing}
               confirmDisabled={pickedKeys.length === 0}
+              tourHighlightKeysBtn={tourDemoStep === "special-keys"}
             />
           </div>
         {:else}
